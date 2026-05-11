@@ -23,6 +23,7 @@ interface Project {
   tags: string[];
   link?: string;
   github?: string;
+  image?: string;
 }
 
 interface Skill {
@@ -74,14 +75,16 @@ export default function App() {
       description: "Modern web application for managing library visitor logs, tracking entries/exits, generating reports, and improving campus library operations with real-time updates.",
       tags: ["React", "UI/UX", "Database"],
       github: "https://github.com/JLNerecina/NEU-Library-Visitor-App",
-      link: "https://remix-neu-library-visitor-app-230692279419.us-west1.run.app/"
+      link: "https://remix-neu-library-visitor-app-230692279419.us-west1.run.app/",
+      image: "/NEU Library Visitor App Preview 1.png"
     },
     {
       title: "NEU MOA Monitoring System",
       description: "Comprehensive monitoring dashboard for tracking Memorandum of Agreement (MOA) status, deadlines, partners, and compliance to streamline university partnerships.",
       tags: ["Dashboard", "Fullstack", "System"],
       github: "https://github.com/JLNerecina/NEU-MOA-Monitoring-System",
-      link: "https://neu-moa-monitoring-system-230692279419.us-west1.run.app/"
+      link: "https://neu-moa-monitoring-system-230692279419.us-west1.run.app/",
+      image: "/NEU MOA Monitoring System Preview.png"
     },
     {
       title: "More Projects Coming Soon",
@@ -114,7 +117,7 @@ export default function App() {
             animate={{ opacity: 1, x: 0 }}
             className="text-2xl font-bold tracking-tight text-white uppercase"
           >
-            JN.
+            JLN.
           </motion.div>
           <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
             {['Home', 'About', 'Skills', 'Projects'].map((item) => (
@@ -162,7 +165,7 @@ export default function App() {
                 John Lian <span className="text-blue-500 block italic">Nerecina</span>
               </h1>
               <p className="text-xl text-zinc-400 mb-10 leading-relaxed max-w-2xl font-light">
-                Designer, Web Developer, and Database Specialist. Current IT student at <span className="font-semibold text-white">New Era University</span>. 
+                Designer, Web Developer, and Database Specialist. Current CS student at <span className="font-semibold text-white">New Era University</span>. 
                 I turn complex ideas into responsive websites and robust applications, focusing on high-quality, user-centered solutions.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -192,7 +195,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "Education", value: "NEU Phil" },
+              { label: "Education", value: "NEU Main" },
               { label: "Specialty", value: "Web Dev" },
               { label: "Location", value: "Quezon City" },
               { label: "Role", value: "Fullstack" }
@@ -210,12 +213,15 @@ export default function App() {
       <section id="about" className="py-24 bg-[#0a0a0a]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-4 items-stretch">
-            {/* Image Placeholder Box */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 relative overflow-hidden group min-h-[400px] flex items-center justify-center">
-              <div className="absolute inset-0 flex items-center justify-center text-zinc-700 group-hover:scale-110 transition-transform duration-700 z-10">
-                <User className="w-32 h-32" />
-              </div>
-              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors z-0"></div>
+            {/* Image Box */}
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group min-h-[400px] flex items-center justify-center">
+              <img 
+                src="/6071405867900277108_121.jpg" 
+                alt="John Lian Nerecina"
+                className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/80 via-transparent to-transparent opacity-60"></div>
+              <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors z-20"></div>
             </div>
             
             {/* Content Box */}
@@ -236,7 +242,7 @@ export default function App() {
                   </div>
                   <div>
                     <div className="font-semibold text-sm">Education</div>
-                    <div className="text-xs text-zinc-500 font-mono">BS IT, New Era University</div>
+                    <div className="text-xs text-zinc-500 font-mono">BSCS, New Era University</div>
                   </div>
                 </div>
                 <div className="flex items-center text-zinc-300">
@@ -322,6 +328,15 @@ export default function App() {
                   <p className="text-zinc-400 text-sm leading-relaxed mb-6 font-light">
                     {project.description}
                   </p>
+                  {project.image && (
+                    <div className="mb-6 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 aspect-video">
+                      <img 
+                        src={project.image} 
+                        alt={project.title}
+                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                      />
+                    </div>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2 mt-auto relative z-10">
                   {project.tags.map((tag) => (
