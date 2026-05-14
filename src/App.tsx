@@ -16,7 +16,8 @@ import {
   LineChart,
   PenTool,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
@@ -146,6 +147,7 @@ const LiquidGlass = () => {
 interface Project {
   title: string;
   description: string;
+  longDescription: string;
   tags: string[];
   link?: string;
   github?: string;
@@ -165,6 +167,7 @@ export default function App() {
   const [itemsPerViewSkill, setItemsPerViewSkill] = useState(1);
   const [activeProject, setActiveProject] = useState(0);
   const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
+  const [expandedProject, setExpandedProject] = useState<Project | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
@@ -213,6 +216,7 @@ export default function App() {
     {
       title: "NEU Library Visitor App",
       description: "Modern web application for managing library visitor logs, tracking entries/exits, generating reports, and improving campus library operations with real-time updates.",
+      longDescription: "A comprehensive visitor tracking and management system tailored for the New Era University Library. The system provides an intuitive interface for students and staff to log their visits securely. An admin dashboard helps librarians analyze visitor trends, manage resources better, and oversee library capacity in real-time. Built with a focus on seamless user experience, fast entry processing, and data security.",
       tags: ["React", "UI/UX", "Database"],
       github: "https://github.com/JLNerecina/NEU-Library-Visitor-App",
       link: "https://remix-neu-library-visitor-app-230692279419.us-west1.run.app/",
@@ -221,6 +225,7 @@ export default function App() {
     {
       title: "NEU MOA Monitoring System",
       description: "Comprehensive monitoring dashboard for tracking Memorandum of Agreement (MOA) status, deadlines, partners, and compliance to streamline university partnerships.",
+      longDescription: "A highly specialized monitoring dashboard designed for standardizing and tracking Memorandums of Agreement (MOA) for New Era University. This system digitizes the MOA lifecycle—from drafting to expiration checking. It features automated alerts that notify administrators before critical agreements lapse, ensuring legal compliance and improved inter-departmental visibility. It also provides a clear audit trail of all signed partnerships.",
       tags: ["Dashboard", "Fullstack", "System"],
       github: "https://github.com/JLNerecina/NEU-MOA-Monitoring-System",
       link: "https://neu-moa-monitoring-system-230692279419.us-west1.run.app/",
@@ -229,6 +234,7 @@ export default function App() {
     {
       title: "CICS Curriculum Map System",
       description: "A Knowledge Management framework designed to visualize and track academic progress, prerequisites, and course relationships for students and admins.",
+      longDescription: "An advanced Knowledge Management framework designed to dynamically visualize academic progress. Using D3.js, the framework provides an interactive node-based curriculum map, allowing students and administrators to deeply understand course relationships and prerequisites. It is instrumental in helping students identify bottlenecks in their path and make informed choices about their academic progression.",
       tags: ["KM Framework", "D3.js", "Education"],
       github: "https://github.com/JLNerecina/PE2-KM-Curriculum-Map",
       image: "/CICS Curriculum Map.png"
@@ -236,6 +242,7 @@ export default function App() {
     {
       title: "HOPE, Inc. Product Management System",
       description: "A comprehensive product management system for HOPE, Inc., streamlining inventory, sales, and data tracking processes.",
+      longDescription: "A scalable, comprehensive product management system specifically developed for HOPE, Inc. to streamline their inventory, sales tracking, and operational processes. Built on a modern tech stack (React & Tailwind on the frontend), this application empowers operations staff to accurately monitor stock levels, manage detailed product lifecycles, and generate insightful business reports. It features robust role-based access control and high-performance data processing.",
       tags: ["Fullstack", "Management System", "Tailwind"],
       github: "https://github.com/fausturnacht/SE2-Zendata-HopePMS",
       image: "/PMS Dashboard.png"
@@ -247,82 +254,82 @@ export default function App() {
       title: "Frontend Development",
       icon: <Globe className="w-5 h-5 text-blue-400" />,
       skills: [
-        { name: "HTML5", src: "https://cdn.simpleicons.org/html5/E34F26" },
-        { name: "CSS3", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" },
-        { name: "JavaScript", src: "https://cdn.simpleicons.org/javascript/F7DF1E" },
-        { name: "TypeScript", src: "https://cdn.simpleicons.org/typescript/3178C6" },
-        { name: "React", src: "https://cdn.simpleicons.org/react/61DAFB" },
-        { name: "Vite", src: "https://cdn.simpleicons.org/vite/646CFF" },
-        { name: "Tailwind CSS", src: "https://cdn.simpleicons.org/tailwindcss/06B6D4" },
-        { name: "Bootstrap", src: "https://cdn.simpleicons.org/bootstrap/7952B3" }
+        { name: "HTML5", src: "https://cdn.simpleicons.org/html5/E34F26", level: "Advanced" },
+        { name: "CSS3", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg", level: "Advanced" },
+        { name: "JavaScript", src: "https://cdn.simpleicons.org/javascript/F7DF1E", level: "Intermediate" },
+        { name: "TypeScript", src: "https://cdn.simpleicons.org/typescript/3178C6", level: "Intermediate" },
+        { name: "React", src: "https://cdn.simpleicons.org/react/61DAFB", level: "Intermediate" },
+        { name: "Vite", src: "https://cdn.simpleicons.org/vite/646CFF", level: "Intermediate" },
+        { name: "Tailwind CSS", src: "https://cdn.simpleicons.org/tailwindcss/06B6D4", level: "Advanced" },
+        { name: "Bootstrap", src: "https://cdn.simpleicons.org/bootstrap/7952B3", level: "Advanced" }
       ]
     },
     {
       title: "Backend & Software Eng.",
       icon: <Terminal className="w-5 h-5 text-indigo-400" />,
       skills: [
-        { name: "PHP", src: "https://cdn.simpleicons.org/php/777BB4" },
-        { name: "Laravel", src: "https://cdn.simpleicons.org/laravel/FF2D20" },
-        { name: "Java", src: "https://cdn.simpleicons.org/openjdk/FFFFFF" },
-        { name: "OOP" },
-        { name: "Design Patterns" },
-        { name: "Data Structures" },
-        { name: "Algorithms" }
+        { name: "PHP", src: "https://cdn.simpleicons.org/php/777BB4", level: "Intermediate" },
+        { name: "Laravel", src: "https://cdn.simpleicons.org/laravel/FF2D20", level: "Intermediate" },
+        { name: "Java", src: "https://cdn.simpleicons.org/openjdk/FFFFFF", level: "Beginner" },
+        { name: "OOP", level: "Advanced" },
+        { name: "Design Patterns", level: "Intermediate" },
+        { name: "Data Structures", level: "Intermediate" },
+        { name: "Algorithms", level: "Intermediate" }
       ]
     },
     {
       title: "AI Orchestration",
       icon: <Cpu className="w-5 h-5 text-purple-400" />,
       skills: [
-        { name: "Google AI Studio", src: "https://cdn.simpleicons.org/google/4285F4" },
-        { name: "Claude Code", src: "https://cdn.simpleicons.org/anthropic/white" },
-        { name: "Antigravity" },
-        { name: "Google Stitch" }
+        { name: "Google AI Studio", src: "https://cdn.simpleicons.org/google/4285F4", level: "Advanced" },
+        { name: "Claude Code", src: "https://cdn.simpleicons.org/anthropic/white", level: "Intermediate" },
+        { name: "Antigravity", level: "Beginner" },
+        { name: "Google Stitch", level: "Beginner" }
       ]
     },
     {
       title: "BaaS, Databases & Local",
       icon: <Database className="w-5 h-5 text-green-400" />,
       skills: [
-        { name: "Supabase", src: "https://cdn.simpleicons.org/supabase/3ECF8E" },
-        { name: "Firestore", src: "https://cdn.simpleicons.org/firebase/FFCA28" },
-        { name: "MySQL", src: "https://cdn.simpleicons.org/mysql/4479A1" },
-        { name: "XAMPP", src: "https://cdn.simpleicons.org/xampp/FB503B" },
-        { name: "Laragon" },
-        { name: "HeidiSQL" }
+        { name: "Supabase", src: "https://cdn.simpleicons.org/supabase/3ECF8E", level: "Intermediate" },
+        { name: "Firestore", src: "https://cdn.simpleicons.org/firebase/FFCA28", level: "Intermediate" },
+        { name: "MySQL", src: "https://cdn.simpleicons.org/mysql/4479A1", level: "Advanced" },
+        { name: "XAMPP", src: "https://cdn.simpleicons.org/xampp/FB503B", level: "Advanced" },
+        { name: "Laragon", level: "Advanced" },
+        { name: "HeidiSQL", level: "Intermediate" }
       ]
     },
     {
       title: "Cybersecurity & OS",
       icon: <Shield className="w-5 h-5 text-red-500" />,
       skills: [
-        { name: "Bash", src: "https://cdn.simpleicons.org/gnubash/4EAA25" },
-        { name: "Burp Suite", src: "https://cdn.simpleicons.org/portswigger/FF6633" },
-        { name: "Oracle VirtualBox", src: "https://cdn.simpleicons.org/virtualbox/183A61" },
-        { name: "Kali Linux", src: "https://cdn.simpleicons.org/kalilinux/557C94" },
-        { name: "Linux Mint", src: "https://cdn.simpleicons.org/linuxmint/87A556" },
-        { name: "Metasploitable" }
+        { name: "Bash", src: "https://cdn.simpleicons.org/gnubash/4EAA25", level: "Intermediate" },
+        { name: "Burp Suite", src: "https://cdn.simpleicons.org/portswigger/FF6633", level: "Beginner" },
+        { name: "Oracle VirtualBox", src: "https://cdn.simpleicons.org/virtualbox/183A61", level: "Intermediate" },
+        { name: "Kali Linux", src: "https://cdn.simpleicons.org/kalilinux/557C94", level: "Intermediate" },
+        { name: "Linux Mint", src: "https://cdn.simpleicons.org/linuxmint/87A556", level: "Advanced" },
+        { name: "Metasploitable", level: "Beginner" }
       ]
     },
     {
       title: "Data Science & Analytics",
       icon: <LineChart className="w-5 h-5 text-orange-400" />,
       skills: [
-        { name: "R", src: "https://cdn.simpleicons.org/r/276DC3" },
-        { name: "Tableau Public" },
-        { name: "tidyverse" },
-        { name: "ggplot2" },
-        { name: "Statistical Analysis" }
+        { name: "R", src: "https://cdn.simpleicons.org/r/276DC3", level: "Beginner" },
+        { name: "Tableau Public", level: "Intermediate" },
+        { name: "tidyverse", level: "Beginner" },
+        { name: "ggplot2", level: "Beginner" },
+        { name: "Statistical Analysis", level: "Intermediate" }
       ]
     },
     {
       title: "Design, UI/UX & PM",
       icon: <PenTool className="w-5 h-5 text-pink-400" />,
       skills: [
-        { name: "Figma", src: "https://cdn.simpleicons.org/figma/F24E1E" },
-        { name: "Adobe Photoshop", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/photoshop/photoshop-original.svg" },
-        { name: "Canva", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/canva/canva-original.svg" },
-        { name: "Project Libre" }
+        { name: "Figma", src: "https://cdn.simpleicons.org/figma/F24E1E", level: "Intermediate" },
+        { name: "Adobe Photoshop", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/photoshop/photoshop-original.svg", level: "Advanced" },
+        { name: "Canva", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/canva/canva-original.svg", level: "Advanced" },
+        { name: "Project Libre", level: "Beginner" }
       ]
     }
   ];
@@ -430,30 +437,31 @@ export default function App() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              className="text-center lg:text-left"
             >
               <span className="inline-block px-4 py-1.5 bg-zinc-900 border border-zinc-800 text-zinc-400 text-[10px] font-mono uppercase tracking-widest rounded-lg mb-6">
                 Available for New Opportunities
               </span>
-              <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-[1.1] uppercase">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1] uppercase">
                 John Lian <span className="text-blue-500 block italic">Nerecina</span>
               </h1>
-              <p className="text-xl text-zinc-400 mb-10 leading-relaxed max-w-2xl font-light">
+              <p className="text-lg lg:text-xl text-zinc-400 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-light">
                 Designer, Web Developer, and Database Specialist. Current CS student at <span className="font-semibold text-white">New Era University</span>. 
-                I turn complex ideas into responsive websites and robust applications, focusing on high-quality, user-centered solutions.
+                I turn complex ideas into responsive websites and robust applications.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-4">
                 <a 
                   href="https://linkedin.com/in/john-lian-nerecina-042744286"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-blue-600 hover:text-white transition-colors group text-sm"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-blue-600 hover:text-white transition-colors group text-sm"
                 >
                   <Linkedin className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
                   Connect on LinkedIn
                 </a>
                 <a 
                   href="#projects"
-                  className="inline-flex items-center px-8 py-4 bg-zinc-900 border border-zinc-800 text-white font-medium rounded-full hover:bg-zinc-800 transition-colors shadow-sm text-sm"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 bg-zinc-900 border border-zinc-800 text-white font-medium rounded-full hover:bg-zinc-800 transition-colors shadow-sm text-sm"
                 >
                   View My Work
                 </a>
@@ -487,11 +495,11 @@ export default function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 bg-black/30 backdrop-blur-sm">
+      <section id="about" className="py-16 lg:py-24 bg-black/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-4 items-stretch">
+          <div className="grid lg:grid-cols-2 gap-6 items-stretch">
             {/* Image Box */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group min-h-[400px] flex items-center justify-center">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group h-[300px] lg:h-auto lg:min-h-[400px] flex items-center justify-center">
               <img 
                 src="/Profile Portfolio.jpg" 
                 alt="John Lian Nerecina"
@@ -502,24 +510,23 @@ export default function App() {
             </div>
             
             {/* Content Box */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 flex flex-col justify-center">
-              <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-6">About Me</h2>
-              <p className="text-lg text-zinc-400 mb-6 leading-relaxed font-light">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-12 flex flex-col justify-center">
+              <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-6 text-center lg:text-left">About Me</h2>
+              <p className="text-base lg:text-lg text-zinc-400 mb-6 leading-relaxed font-light">
                 Currently pursuing my degree at New Era University, I am deeply invested in the ever-evolving landscape of software development. 
                 My journey began with a curiosity for how systems work, which quickly turned into a passion for creating impactful applications.
               </p>
-              <p className="text-lg text-zinc-400 mb-10 leading-relaxed font-light">
+              <p className="text-base lg:text-lg text-zinc-400 mb-8 leading-relaxed font-light">
                 I believe in clean code, continuous learning, and the power of technology to solve real-world problems. 
-                When I'm not coding, you can find me exploring new tech trends or collaborating on open-source projects.
               </p>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center text-zinc-300">
                   <div className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center mr-4">
                     <BookOpen className="w-5 h-5 text-blue-500" />
                   </div>
                   <div>
                     <div className="font-semibold text-sm">Education</div>
-                    <div className="text-xs text-zinc-500 font-mono">BSCS, New Era University</div>
+                    <div className="text-xs text-zinc-500 font-mono">BSCS, NEU</div>
                   </div>
                 </div>
                 <div className="flex items-center text-zinc-300">
@@ -527,8 +534,8 @@ export default function App() {
                     <Briefcase className="w-5 h-5 text-blue-500" />
                   </div>
                   <div>
-                    <div className="font-semibold text-sm">Current Status</div>
-                    <div className="text-xs text-zinc-500 font-mono">Available for Internships</div>
+                    <div className="font-semibold text-sm">Status</div>
+                    <div className="text-xs text-zinc-500 font-mono">Internships</div>
                   </div>
                 </div>
               </div>
@@ -538,10 +545,10 @@ export default function App() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-24 relative overflow-hidden">
+      <section id="skills" className="py-16 lg:py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-16 relative">
-            <h2 className="text-4xl font-bold mb-4 inline-block relative">
+          <div className="text-center mb-12 relative">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 inline-block relative">
               Skills & Expertise
               <motion.div 
                 initial={{ width: 0 }}
@@ -572,8 +579,22 @@ export default function App() {
                           <motion.div 
                             key={j}
                             whileHover={{ scale: 1.05 }}
-                            className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center group/skill hover:bg-zinc-800 transition-colors h-28 max-w-[150px]"
+                            className="w-full relative bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center group/skill hover:bg-zinc-800 transition-colors h-32 max-w-[150px]"
                           >
+                            {(() => {
+                              let width = "w-[50%]";
+                              let color = "bg-zinc-600";
+                              let levelText = skill.level || "Neutral";
+                              if (skill.level === "Beginner") { width = "w-[33%]"; color = "bg-zinc-400"; }
+                              else if (skill.level === "Intermediate") { width = "w-[66%]"; color = "bg-blue-400"; }
+                              else if (skill.level === "Advanced") { width = "w-[100%]"; color = "bg-green-400"; }
+                              
+                              return (
+                                <div className="absolute top-3 right-3 group/tooltip cursor-help" title={levelText}>
+                                  <div className={`w-2 h-2 rounded-full ${color} opacity-70 group-hover/skill:opacity-100 transition-opacity shadow-[0_0_8px_rgba(255,255,255,0.1)]`} style={{ boxShadow: `0 0 8px var(--tw-shadow-color)`}} />
+                                </div>
+                              );
+                            })()}
                             {skill.src ? (
                               <img src={skill.src} alt={skill.name} className="w-10 h-10 mb-3 object-contain group-hover/skill:scale-110 transition-transform" />
                             ) : (
@@ -583,6 +604,19 @@ export default function App() {
                             )}
                             <div className="text-[10px] text-zinc-500 uppercase font-mono tracking-tighter group-hover/skill:text-zinc-300 transition-colors">
                               {skill.name}
+                            </div>
+                            {/* Subtle Progress Bar */}
+                            <div className="w-16 h-0.5 bg-zinc-800 rounded-full mt-2 overflow-hidden opacity-0 group-hover/skill:opacity-100 transition-opacity duration-300">
+                                {(() => {
+                                  let width = "w-[50%]";
+                                  let color = "bg-zinc-600";
+                                  if (skill.level === "Beginner") { width = "w-[33%]"; color = "bg-zinc-400"; }
+                                  else if (skill.level === "Intermediate") { width = "w-[66%]"; color = "bg-blue-400"; }
+                                  else if (skill.level === "Advanced") { width = "w-[100%]"; color = "bg-green-400"; }
+                                  return (
+                                    <div className={`h-full ${width} ${color}`} />
+                                  );
+                                })()}
                             </div>
                           </motion.div>
                         ))}
@@ -625,12 +659,12 @@ export default function App() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-24 bg-black/20">
+      <section id="projects" className="py-16 lg:py-24 bg-black/20">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 space-y-4 md:space-y-0">
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 space-y-6 md:space-y-0 text-center md:text-left">
             <div>
               <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Featured Projects</h2>
-              <p className="text-zinc-400 max-w-xl text-xl font-light">Highlighting some of my most impactful work and technical explorations.</p>
+              <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light">Impactful work and technical explorations.</p>
             </div>
             <a href="https://github.com/JLNerecina" target="_blank" rel="noreferrer" className="text-blue-500 font-medium flex items-center hover:text-white transition-colors text-sm">
               View all on GitHub <ExternalLink className="w-4 h-4 ml-2" />
@@ -645,14 +679,15 @@ export default function App() {
                 {projects.map((project, i) => (
                   <div key={i} className="w-full lg:w-1/2 flex-shrink-0 px-2 lg:px-4">
                     <motion.div 
-                      className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl"
+                      onClick={() => setExpandedProject(project)}
+                      className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl cursor-pointer"
                     >
                       <div className="relative z-10">
                         <div className="flex justify-between items-start mb-6">
                           <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-colors">
                             <Code2 className="w-6 h-6" />
                           </div>
-                          <div className="flex space-x-2 text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex space-x-2 text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                             {project.github && <a href={project.github} target="_blank" rel="noreferrer" className="hover:text-white transition-colors p-1"><Github className="w-5 h-5" /></a>}
                             {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="hover:text-white transition-colors p-1"><ExternalLink className="w-5 h-5" /></a>}
                           </div>
@@ -667,6 +702,7 @@ export default function App() {
                               src={project.image} 
                               alt={project.title}
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                              loading="lazy"
                             />
                           </div>
                         )}
@@ -764,6 +800,70 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Project Modal */}
+      <AnimatePresence>
+        {expandedProject && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm"
+            onClick={() => setExpandedProject(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-zinc-950 border border-zinc-800 rounded-[2rem] w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl overflow-hidden relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setExpandedProject(null)}
+                className="absolute top-6 right-6 p-2 bg-black/50 hover:bg-black/80 backdrop-blur-md rounded-full text-zinc-400 hover:text-white transition-colors z-20"
+              >
+                <X className="w-6 h-6" />
+              </button>
+
+              {expandedProject.image && (
+                <div className="w-full h-64 md:h-96 relative border-b border-zinc-800">
+                  <img src={expandedProject.image} alt={expandedProject.title} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
+                </div>
+              )}
+
+              <div className="p-8 md:p-12 relative z-10 -mt-16 md:-mt-24">
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                  {expandedProject.github && (
+                    <a href={expandedProject.github} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 hover:text-white text-zinc-300 text-sm transition-colors">
+                      <Github className="w-4 h-4 mr-2" /> Source Code
+                    </a>
+                  )}
+                  {expandedProject.link && (
+                    <a href={expandedProject.link} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 bg-blue-600 rounded-full hover:bg-blue-500 text-white text-sm transition-colors shadow-lg shadow-blue-900/20">
+                      <ExternalLink className="w-4 h-4 mr-2" /> Live Demo
+                    </a>
+                  )}
+                </div>
+
+                <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">{expandedProject.title}</h2>
+                <div className="flex flex-wrap gap-2 mb-8">
+                  {expandedProject.tags.map((tag) => (
+                    <span key={tag} className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono tracking-widest uppercase text-zinc-400">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                
+                <h3 className="text-xl font-medium mb-4 text-white">Project Overview</h3>
+                <p className="text-zinc-400 leading-relaxed text-lg font-light">
+                  {expandedProject.longDescription || expandedProject.description}
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

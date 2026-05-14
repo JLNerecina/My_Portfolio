@@ -28,27 +28,41 @@
 .orb {
     position: fixed;
     border-radius: 50%;
-    filter: blur(80px);
+    filter: blur(60px);
     z-index: 0;
     animation: orb-float 10s infinite ease-in-out;
     pointer-events: none;
 }
 
 .orb-1 {
-    width: 300px;
-    height: 300px;
+    width: 200px;
+    height: 200px;
     background: #7b2cbf;
-    top: 10%;
-    left: 20%;
+    top: 5%;
+    left: 10%;
 }
 
 .orb-2 {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     background: #00c6ff;
-    bottom: 20%;
-    right: 20%;
+    bottom: 10%;
+    right: 10%;
     animation-delay: -5s;
+}
+
+@media (min-width: 1024px) {
+    .orb {
+        filter: blur(80px);
+    }
+    .orb-1 {
+        width: 400px;
+        height: 400px;
+    }
+    .orb-2 {
+        width: 300px;
+        height: 300px;
+    }
 }
 
 @keyframes orb-float {
@@ -170,18 +184,25 @@
 
 @media (max-width: 650px) {
     .glass-nav-container {
-        padding: 6px;
+        padding: 4px;
         width: 100%;
         gap: 0;
         justify-content: space-around;
+        border-radius: 24px;
     }
     .glass-nav-item {
         width: auto;
         flex: 1;
-        min-width: 60px;
+        min-width: 50px;
+        height: 50px;
     }
     .glass-nav-text {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+    }
+    .glass-nav-icon svg {
+        width: 18px;
+        height: 18px;
     }
 }
 
