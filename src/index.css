@@ -30,6 +30,7 @@
     border-radius: 50%;
     filter: blur(60px);
     z-index: 0;
+    opacity: 0.8;
     animation: orb-float 10s infinite ease-in-out;
     pointer-events: none;
 }

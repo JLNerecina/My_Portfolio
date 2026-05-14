@@ -428,8 +428,10 @@ export default function App() {
         </nav>
       </header>
 
-      {/* Hero Section */}
-      <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-black/10">
+      {/* Main Content Sections */}
+      <main className="relative z-10">
+        {/* Hero Section */}
+        <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-black/10">
         <div className="absolute top-0 right-0 -z-10 w-1/3 h-1/2 bg-blue-500/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/4"></div>
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -679,8 +681,10 @@ export default function App() {
                 {projects.map((project, i) => (
                   <div key={i} className="w-full lg:w-1/2 flex-shrink-0 px-2 lg:px-4">
                     <motion.div 
+                      whileHover={{ y: -8, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
                       onClick={() => setExpandedProject(project)}
-                      className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl cursor-pointer"
+                      className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl cursor-pointer shadow-xl"
                     >
                       <div className="relative z-10">
                         <div className="flex justify-between items-start mb-6">
@@ -756,30 +760,44 @@ export default function App() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-24 bg-transparent text-white">
+      <section id="contact" className="py-24 bg-transparent text-white relative z-10">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-blue-600 rounded-3xl p-12 md:p-24 text-center relative overflow-hidden h-full border border-blue-500">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
+          <div className="bg-blue-600/10 backdrop-blur-3xl rounded-3xl p-12 md:p-24 text-center relative overflow-hidden h-full border border-white/10 shadow-2xl shadow-blue-500/10">
+            {/* Animated background highlights */}
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4 animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/4 animate-pulse" style={{ animationDelay: '1s' }}></div>
+            
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-5xl font-light mb-6 tracking-tight">Ready to start a project?</h2>
-              <p className="text-lg text-blue-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+              <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
+                Ready to start a project?
+              </h2>
+              <p className="text-lg md:text-xl text-zinc-300 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
                 I'm currently looking for new opportunities and collaborations. 
                 Whether you have a question or just want to say hi, my inbox is always open.
               </p>
-              <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+              <div className="flex flex-col md:flex-row justify-center items-center gap-6">
                 <a 
                   href="mailto:johnlian.nerecina@neu.edu.ph"
-                  className="w-full md:w-auto px-8 py-4 bg-white text-black font-semibold rounded-full hover:bg-zinc-100 active:scale-95 transition-all text-sm shadow-xl shadow-blue-900/20"
+                  className="w-full md:w-auto px-10 py-5 bg-white text-black font-semibold rounded-full hover:bg-blue-500 hover:text-white active:scale-95 transition-all text-base shadow-2xl shadow-white/10"
                 >
                   Email Me Direct
                 </a>
-                <div className="flex space-x-4">
-                  <a href="https://linkedin.com/in/john-lian-nerecina-042744286" className="p-4 bg-blue-700/50 rounded-full hover:bg-blue-700 transition-colors hover:scale-105 active:scale-95">
-                    <Linkedin className="w-5 h-5" />
+                <div className="flex gap-4">
+                  <a 
+                    href="https://linkedin.com/in/john-lian-nerecina-042744286" 
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all hover:scale-110 active:scale-95 backdrop-blur-md group"
+                  >
+                    <Linkedin className="w-6 h-6 text-blue-400 group-hover:text-blue-300" />
                   </a>
-                  <a href="https://github.com/JLNerecina" target="_blank" rel="noreferrer" className="p-4 bg-blue-700/50 rounded-full hover:bg-blue-700 transition-colors hover:scale-105 active:scale-95">
-                    <Github className="w-5 h-5" />
+                  <a 
+                    href="https://github.com/JLNerecina" 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="p-5 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all hover:scale-110 active:scale-95 backdrop-blur-md group"
+                  >
+                    <Github className="w-6 h-6 text-zinc-400 group-hover:text-white" />
                   </a>
                 </div>
               </div>
@@ -800,6 +818,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      </main>
 
       {/* Project Modal */}
       <AnimatePresence>
