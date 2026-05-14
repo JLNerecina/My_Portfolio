@@ -1,20 +1,146 @@
 import { 
   Github, 
   Linkedin, 
-  Mail, 
   ExternalLink, 
   Code2, 
-  Layers, 
   User, 
   BookOpen, 
   Briefcase,
   Terminal,
   Cpu,
   Globe,
-  Database
+  Database,
+  Home,
+  FolderOpen,
+  Shield,
+  LineChart,
+  PenTool,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+
+// --- LIQUID GLASS COMPONENT ---
+const LiquidGlass = () => {
+  const glassRef = useRef<HTMLDivElement>(null);
+  const particlesRef = useRef<(HTMLDivElement | null)[]>([]);
+  const [isShattered, setIsShattered] = useState(false);
+  const requestRef = useRef<number>();
+  const timeRef = useRef<number>(0);
+  const targetRef = useRef({ x: 0, y: 0 });
+  const currentRef = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      targetRef.current.x = (window.innerWidth / 2 - e.pageX) / 25;
+      targetRef.current.y = (window.innerHeight / 2 - e.pageY) / 25;
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    const animate = () => {
+      if (isShattered) return;
+      currentRef.current.x += (targetRef.current.x - currentRef.current.x) * 0.1;
+      currentRef.current.y += (targetRef.current.y - currentRef.current.y) * 0.1;
+      
+      if (glassRef.current) {
+        glassRef.current.style.transform = `rotateY(${currentRef.current.x}deg) rotateX(${currentRef.current.y}deg)`;
+      }
+
+      timeRef.current += 0.03;
+
+      particlesRef.current.forEach((p, i) => {
+        if (!p) return;
+        const speed = (i + 1) * 1.2;
+        const floatX = Math.sin(timeRef.current * 0.5 + i * 10) * 10;
+        const floatY = Math.cos(timeRef.current * 0.3 + i * 10) * 10;
+        p.style.transform = `translate(${-currentRef.current.x * speed + floatX}px, ${-currentRef.current.y * speed + floatY}px)`;
+      });
+
+      requestRef.current = requestAnimationFrame(animate);
+    };
+    
+    requestRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+    };
+  }, [isShattered]);
+
+  const handleShatter = () => {
+    if (isShattered) return;
+    setIsShattered(true);
+
+    if (glassRef.current) {
+        glassRef.current.style.transform = 'scale(1)';
+    }
+
+    const rect = glassRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    for (let i = 0; i < 15; i++) {
+        const shard = document.createElement('div');
+        shard.classList.add('shard');
+        
+        const size = Math.random() * 30 + 10;
+        shard.style.width = `${size}px`;
+        shard.style.height = `${size}px`;
+        shard.style.left = `${centerX}px`;
+        shard.style.top = `${centerY}px`;
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 300 + 100;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+        const rot = Math.random() * 720;
+
+        shard.animate([
+            { transform: 'translate(-50%, -50%) rotate(0deg)', opacity: 1 },
+            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) rotate(${rot}deg)`, opacity: 0 }
+        ], {
+            duration: 800,
+            easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+            fill: 'forwards'
+        });
+
+        document.body.appendChild(shard);
+        setTimeout(() => shard.remove(), 800);
+    }
+
+    setTimeout(() => {
+      setIsShattered(false);
+    }, 4000);
+  };
+
+  return (
+    <div className="relative flex justify-center items-center w-full h-[400px] lg:h-[500px] -mt-10 lg:mt-0" style={{ perspective: '1000px' }}>
+      <div className="absolute inset-0 gooey-filter z-0 flex justify-center items-center overflow-visible pointer-events-none">
+        <div className="background-shape shape-1"></div>
+        <div className="background-shape shape-2"></div>
+      </div>
+
+      <svg style={{ position: 'absolute', width: 0, height: 0 }}>
+        <filter id="goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+        </filter>
+      </svg>
+
+      <div 
+        ref={glassRef} 
+        className={`liquid-glass ${isShattered ? 'shattered' : ''}`}
+        onClick={handleShatter}
+      >
+        <div ref={el => particlesRef.current[0] = el} className="particle" style={{ width: '15px', height: '15px', top: '20%', left: '20%' }}></div>
+        <div ref={el => particlesRef.current[1] = el} className="particle" style={{ width: '10px', height: '10px', top: '60%', left: '80%' }}></div>
+        <div ref={el => particlesRef.current[2] = el} className="particle" style={{ width: '8px', height: '8px', top: '40%', left: '50%' }}></div>
+      </div>
+    </div>
+  );
+};
 
 // Types
 interface Project {
@@ -35,6 +161,20 @@ interface Skill {
 export default function App() {
   const [activeSection, setActiveSection] = useState('home');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSkill, setActiveSkill] = useState(0);
+  const [itemsPerViewSkill, setItemsPerViewSkill] = useState(1);
+  const [activeProject, setActiveProject] = useState(0);
+  const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setItemsPerViewProject(window.innerWidth >= 1024 ? 2 : 1);
+      setItemsPerViewSkill(window.innerWidth >= 1024 ? 2 : 1);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,72 +227,205 @@ export default function App() {
       image: "/NEU MOA Monitoring System Preview.png"
     },
     {
-      title: "More Projects Coming Soon",
-      description: "Constantly building and experimenting with new technologies. Stay tuned for upcoming full-stack applications and open-source contributions.",
-      tags: ["Coming Soon", "In Progress"],
-      github: "https://github.com/JLNerecina",
+      title: "CICS Curriculum Map System",
+      description: "A Knowledge Management framework designed to visualize and track academic progress, prerequisites, and course relationships for students and admins.",
+      tags: ["KM Framework", "D3.js", "Education"],
+      github: "https://github.com/JLNerecina/PE2-KM-Curriculum-Map",
+      image: "/CICS Curriculum Map.png"
+    },
+    {
+      title: "HOPE, Inc. Product Management System",
+      description: "A comprehensive product management system for HOPE, Inc., streamlining inventory, sales, and data tracking processes.",
+      tags: ["Fullstack", "Management System", "Tailwind"],
+      github: "https://github.com/fausturnacht/SE2-Zendata-HopePMS",
+      image: "/PMS Dashboard.png"
     }
   ];
 
-  const skills: Skill[] = [
-    { name: "Frontend Development", icon: <Globe className="w-5 h-5" />, level: "Advanced" },
-    { name: "Backend Systems", icon: <Terminal className="w-5 h-5" />, level: "Intermediate" },
-    { name: "Database Design", icon: <Database className="w-5 h-5" />, level: "Intermediate" },
-    { name: "Cloud Infrastructure", icon: <Cpu className="w-5 h-5" />, level: "Beginner" },
-    { name: "System Architecture", icon: <Layers className="w-5 h-5" />, level: "Intermediate" },
-    { name: "UI/UX Design", icon: <Code2 className="w-5 h-5" />, level: "Advanced" }
+  const skillGroups = [
+    {
+      title: "Frontend Development",
+      icon: <Globe className="w-5 h-5 text-blue-400" />,
+      skills: [
+        { name: "HTML5", src: "https://cdn.simpleicons.org/html5/E34F26" },
+        { name: "CSS3", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/css3/css3-original.svg" },
+        { name: "JavaScript", src: "https://cdn.simpleicons.org/javascript/F7DF1E" },
+        { name: "TypeScript", src: "https://cdn.simpleicons.org/typescript/3178C6" },
+        { name: "React", src: "https://cdn.simpleicons.org/react/61DAFB" },
+        { name: "Vite", src: "https://cdn.simpleicons.org/vite/646CFF" },
+        { name: "Tailwind CSS", src: "https://cdn.simpleicons.org/tailwindcss/06B6D4" },
+        { name: "Bootstrap", src: "https://cdn.simpleicons.org/bootstrap/7952B3" }
+      ]
+    },
+    {
+      title: "Backend & Software Eng.",
+      icon: <Terminal className="w-5 h-5 text-indigo-400" />,
+      skills: [
+        { name: "PHP", src: "https://cdn.simpleicons.org/php/777BB4" },
+        { name: "Laravel", src: "https://cdn.simpleicons.org/laravel/FF2D20" },
+        { name: "Java", src: "https://cdn.simpleicons.org/openjdk/FFFFFF" },
+        { name: "OOP" },
+        { name: "Design Patterns" },
+        { name: "Data Structures" },
+        { name: "Algorithms" }
+      ]
+    },
+    {
+      title: "AI Orchestration",
+      icon: <Cpu className="w-5 h-5 text-purple-400" />,
+      skills: [
+        { name: "Google AI Studio", src: "https://cdn.simpleicons.org/google/4285F4" },
+        { name: "Claude Code", src: "https://cdn.simpleicons.org/anthropic/white" },
+        { name: "Antigravity" },
+        { name: "Google Stitch" }
+      ]
+    },
+    {
+      title: "BaaS, Databases & Local",
+      icon: <Database className="w-5 h-5 text-green-400" />,
+      skills: [
+        { name: "Supabase", src: "https://cdn.simpleicons.org/supabase/3ECF8E" },
+        { name: "Firestore", src: "https://cdn.simpleicons.org/firebase/FFCA28" },
+        { name: "MySQL", src: "https://cdn.simpleicons.org/mysql/4479A1" },
+        { name: "XAMPP", src: "https://cdn.simpleicons.org/xampp/FB503B" },
+        { name: "Laragon" },
+        { name: "HeidiSQL" }
+      ]
+    },
+    {
+      title: "Cybersecurity & OS",
+      icon: <Shield className="w-5 h-5 text-red-500" />,
+      skills: [
+        { name: "Bash", src: "https://cdn.simpleicons.org/gnubash/4EAA25" },
+        { name: "Burp Suite", src: "https://cdn.simpleicons.org/portswigger/FF6633" },
+        { name: "Oracle VirtualBox", src: "https://cdn.simpleicons.org/virtualbox/183A61" },
+        { name: "Kali Linux", src: "https://cdn.simpleicons.org/kalilinux/557C94" },
+        { name: "Linux Mint", src: "https://cdn.simpleicons.org/linuxmint/87A556" },
+        { name: "Metasploitable" }
+      ]
+    },
+    {
+      title: "Data Science & Analytics",
+      icon: <LineChart className="w-5 h-5 text-orange-400" />,
+      skills: [
+        { name: "R", src: "https://cdn.simpleicons.org/r/276DC3" },
+        { name: "Tableau Public" },
+        { name: "tidyverse" },
+        { name: "ggplot2" },
+        { name: "Statistical Analysis" }
+      ]
+    },
+    {
+      title: "Design, UI/UX & PM",
+      icon: <PenTool className="w-5 h-5 text-pink-400" />,
+      skills: [
+        { name: "Figma", src: "https://cdn.simpleicons.org/figma/F24E1E" },
+        { name: "Adobe Photoshop", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/photoshop/photoshop-original.svg" },
+        { name: "Canva", src: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/canva/canva-original.svg" },
+        { name: "Project Libre" }
+      ]
+    }
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white font-sans selection:bg-blue-500/30 selection:text-blue-200">
-      {/* Navigation */}
-      <nav 
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-[#0a0a0a]/80 backdrop-blur-md shadow-sm border-b border-white/10 py-3' : 'bg-transparent py-6'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+    <div className="min-h-screen relative overflow-x-hidden moving-gradient text-white font-sans selection:bg-blue-500/30 selection:text-blue-200">
+      <div className="orb orb-1"></div>
+      <div className="orb orb-2"></div>
+
+      {/* SVG Definitions */}
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <linearGradient id="primary-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop stopColor="#00c6ff" offset="0%" />
+            <stop stopColor="#0072ff" offset="100%" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* Header & Glass Navigation */}
+      <header className="fixed top-4 left-0 right-0 z-50 pointer-events-none px-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center bg-black/40 backdrop-blur-md border border-white/5 p-3 px-6 rounded-full shadow-2xl pointer-events-auto">
+          {/* Logo */}
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-2xl font-bold tracking-tight text-white uppercase"
+            className="pointer-events-auto shadow-lg flex items-center space-x-3"
           >
-            JLN.
+            <img src="/My Logo - JLN.png" alt="JLN Logo" className="h-10 md:h-12 object-contain rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
+            <span className="text-xs md:text-sm font-bold uppercase tracking-widest text-white/90 hidden sm:block">Online Portfolio</span>
           </motion.div>
-          <div className="hidden md:flex items-center space-x-8 text-sm font-medium">
-            {['Home', 'About', 'Skills', 'Projects'].map((item) => (
-              <a 
-                key={item}
-                href={`#${item.toLowerCase()}`}
-                onClick={() => setActiveSection(item.toLowerCase())}
-                className={`transition-colors relative py-1 ${
-                  activeSection === item.toLowerCase() ? 'text-blue-500' : 'hover:text-blue-500 text-zinc-500 font-mono uppercase tracking-widest text-[10px]'
-                }`}
-              >
-                {item}
-                {activeSection === item.toLowerCase() && (
-                  <motion.div 
-                    layoutId="nav-underline"
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-500 rounded-full"
-                  />
-                )}
-              </a>
-            ))}
-            <a 
-              href="mailto:johnlian.nerecina@neu.edu.ph"
-              className="bg-zinc-900 border border-zinc-800 text-zinc-300 px-5 py-2 rounded-lg hover:bg-white hover:text-black hover:border-white transition-all text-xs font-mono uppercase tracking-widest"
-            >
-              Get in Touch
-            </a>
-          </div>
+          
+          {/* Main Navigation - Integrated horizontally on Desktop */}
+          <nav className="hidden md:flex flex-1 justify-center pointer-events-auto">
+            <ul className="glass-nav-container !rounded-full py-1.5 px-3">
+              {[
+                { id: 'home', label: 'Home', icon: <Home className="w-4 h-4" /> },
+                { id: 'about', label: 'About', icon: <User className="w-4 h-4" /> },
+                { id: 'skills', label: 'Skills', icon: <Code2 className="w-4 h-4" /> },
+                { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-4 h-4" /> },
+              ].map((item) => (
+                <li 
+                  key={item.id} 
+                  className={`glass-nav-item-wrapper ${activeSection === item.id ? 'active' : ''}`}
+                >
+                  <a 
+                    href={`#${item.id}`}
+                    onClick={() => setActiveSection(item.id)}
+                    className="glass-nav-item !h-[45px] !w-[80px]"
+                  >
+                    <div className="glass-nav-content">
+                      <span className="glass-nav-text text-xs">{item.label}</span>
+                      <span className="glass-nav-icon">{item.icon}</span>
+                    </div>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Contact Button */}
+          <a 
+            href="mailto:johnlian.nerecina@neu.edu.ph"
+            className="bg-white/10 border border-white/20 backdrop-blur-md text-white px-5 py-2.5 rounded-full hover:bg-white hover:text-black transition-all text-xs font-mono uppercase tracking-widest shadow-xl ml-auto md:ml-0"
+          >
+            Get in Touch
+          </a>
         </div>
-      </nav>
+        
+        {/* Mobile Navbar sticking to bottom */}
+        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:hidden flex justify-center pointer-events-auto">
+          <ul className="glass-nav-container w-full justify-around !rounded-2xl">
+            {[
+              { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" /> },
+              { id: 'about', label: 'About', icon: <User className="w-5 h-5" /> },
+              { id: 'skills', label: 'Skills', icon: <Code2 className="w-5 h-5" /> },
+              { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-5 h-5" /> },
+            ].map((item) => (
+              <li 
+                key={item.id} 
+                className={`glass-nav-item-wrapper ${activeSection === item.id ? 'active' : ''}`}
+              >
+                <a 
+                  href={`#${item.id}`}
+                  onClick={() => setActiveSection(item.id)}
+                  className="glass-nav-item"
+                >
+                  <div className="glass-nav-content">
+                    <span className="glass-nav-text">{item.label}</span>
+                    <span className="glass-nav-icon">{item.icon}</span>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
 
       {/* Hero Section */}
-      <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+      <section id="home" className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-black/10">
         <div className="absolute top-0 right-0 -z-10 w-1/3 h-1/2 bg-blue-500/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/4"></div>
         <div className="max-w-7xl mx-auto px-6">
-          <div className="max-w-3xl">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -186,12 +459,16 @@ export default function App() {
                 </a>
               </div>
             </motion.div>
+
+            <div className="hidden lg:flex w-full justify-center">
+              <LiquidGlass />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Stats/Badges */}
-      <section className="py-12 bg-[#0a0a0a]">
+      <section className="py-12 bg-transparent">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
@@ -210,15 +487,15 @@ export default function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 bg-[#0a0a0a]">
+      <section id="about" className="py-24 bg-black/30 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-4 items-stretch">
             {/* Image Box */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group min-h-[400px] flex items-center justify-center">
               <img 
-                src="/6071405867900277108_121.jpg" 
+                src="/Profile Portfolio.jpg" 
                 alt="John Lian Nerecina"
-                className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700" 
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/80 via-transparent to-transparent opacity-60"></div>
               <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors z-20"></div>
@@ -261,39 +538,94 @@ export default function App() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="py-24 bg-[#0a0a0a]">
+      <section id="skills" className="py-24 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="mb-12">
-            <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Technical Proficiency</h2>
-            <p className="text-zinc-400 max-w-2xl text-xl font-light">A versatile toolkit developed through academic excellence and hands-on project experience.</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {skills.map((skill, i) => (
+          <div className="text-center mb-16 relative">
+            <h2 className="text-4xl font-bold mb-4 inline-block relative">
+              Skills & Expertise
               <motion.div 
-                key={i}
-                whileHover={{ y: -5 }}
-                className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl hover:bg-zinc-800/80 transition-all relative overflow-hidden group"
+                initial={{ width: 0 }}
+                whileInView={{ width: '60%' }}
+                className="h-1 bg-blue-500 mx-auto mt-2 rounded-full"
+              />
+            </h2>
+          </div>
+
+          <div className="relative max-w-5xl mx-auto">
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${activeSkill * (100 / itemsPerViewSkill)}%)` }}
               >
-                <div className="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-white mb-6 group-hover:bg-blue-600 transition-colors">
-                  {skill.icon}
-                </div>
-                <h3 className="text-lg font-medium mb-3 text-white">{skill.name}</h3>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">{skill.level}</span>
-                  <div className="flex space-x-1">
-                    {[1, 2, 3].map((dot) => (
-                      <div key={dot} className={`w-1.5 h-1.5 rounded-full ${dot <= (skill.level === 'Advanced' ? 3 : 2) ? 'bg-blue-500' : 'bg-zinc-700'}`}></div>
-                    ))}
+                {skillGroups.map((group, i) => (
+                  <div key={i} className="w-full lg:w-1/2 flex-shrink-0 px-2 lg:px-4">
+                    <motion.div 
+                      className="bg-zinc-950/40 backdrop-blur-md border border-zinc-800/50 p-8 rounded-[2rem] hover:border-blue-500/30 transition-all group h-full"
+                    >
+                      <div className="flex items-center space-x-3 mb-8 justify-center">
+                        {group.icon}
+                        <h3 className="text-xl font-bold tracking-tight text-center">{group.title}</h3>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 justify-items-center">
+                        {group.skills.map((skill, j) => (
+                          <motion.div 
+                            key={j}
+                            whileHover={{ scale: 1.05 }}
+                            className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 flex flex-col items-center justify-center text-center group/skill hover:bg-zinc-800 transition-colors h-28 max-w-[150px]"
+                          >
+                            {skill.src ? (
+                              <img src={skill.src} alt={skill.name} className="w-10 h-10 mb-3 object-contain group-hover/skill:scale-110 transition-transform" />
+                            ) : (
+                              <div className="w-10 h-10 mb-3 flex items-center justify-center bg-zinc-800/50 text-white rounded-xl font-bold group-hover/skill:scale-110 transition-transform border border-zinc-700/50">
+                                 <span className="text-xl">{skill.name.charAt(0)}</span>
+                              </div>
+                            )}
+                            <div className="text-[10px] text-zinc-500 uppercase font-mono tracking-tighter group-hover/skill:text-zinc-300 transition-colors">
+                              {skill.name}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex justify-center items-center mt-8 space-x-4">
+              <button 
+                onClick={() => setActiveSkill(s => s === 0 ? Math.max(0, skillGroups.length - itemsPerViewSkill) : s - 1)}
+                className="p-3 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 text-white transition-colors"
+                aria-label="Previous skill group"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex space-x-2">
+                {Array.from({ length: Math.max(1, skillGroups.length - itemsPerViewSkill + 1) }).map((_, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setActiveSkill(i)}
+                    aria-label={`Go to skill group ${i + 1}`}
+                    className={`h-2.5 rounded-full transition-all duration-300 ${i === activeSkill ? 'bg-blue-500 w-8' : 'bg-zinc-700 w-2.5 hover:bg-zinc-500'}`}
+                  />
+                ))}
+              </div>
+              <button 
+                onClick={() => setActiveSkill(s => (s + 1) > (skillGroups.length - itemsPerViewSkill) ? 0 : s + 1)}
+                className="p-3 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 text-white transition-colors"
+                aria-label="Next skill group"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-24 bg-[#0a0a0a]">
+      <section id="projects" className="py-24 bg-black/20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 space-y-4 md:space-y-0">
             <div>
@@ -304,59 +636,91 @@ export default function App() {
               View all on GitHub <ExternalLink className="w-4 h-4 ml-2" />
             </a>
           </div>
-          <div className="grid lg:grid-cols-3 gap-4">
-            {projects.map((project, i) => (
-              <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                viewport={{ once: true }}
-                className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[320px] flex flex-col justify-between overflow-hidden"
+          <div className="relative max-w-5xl mx-auto">
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(-${activeProject * (100 / itemsPerViewProject)}%)` }}
               >
-                <div className="relative z-10">
-                  <div className="flex justify-between items-start mb-6">
-                    <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-colors">
-                      <Code2 className="w-6 h-6" />
-                    </div>
-                    <div className="flex space-x-2 text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {project.github && <a href={project.github} target="_blank" rel="noreferrer" className="hover:text-white transition-colors p-1"><Github className="w-5 h-5" /></a>}
-                      {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="hover:text-white transition-colors p-1"><ExternalLink className="w-5 h-5" /></a>}
-                    </div>
+                {projects.map((project, i) => (
+                  <div key={i} className="w-full lg:w-1/2 flex-shrink-0 px-2 lg:px-4">
+                    <motion.div 
+                      className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl"
+                    >
+                      <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-colors">
+                            <Code2 className="w-6 h-6" />
+                          </div>
+                          <div className="flex space-x-2 text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {project.github && <a href={project.github} target="_blank" rel="noreferrer" className="hover:text-white transition-colors p-1"><Github className="w-5 h-5" /></a>}
+                            {project.link && <a href={project.link} target="_blank" rel="noreferrer" className="hover:text-white transition-colors p-1"><ExternalLink className="w-5 h-5" /></a>}
+                          </div>
+                        </div>
+                        <h3 className="text-xl font-medium mb-3 text-white">{project.title}</h3>
+                        <p className="text-zinc-400 text-sm leading-relaxed mb-6 font-light">
+                          {project.description}
+                        </p>
+                        {project.image && (
+                          <div className="mb-6 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 aspect-video">
+                            <img 
+                              src={project.image} 
+                              alt={project.title}
+                              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-auto relative z-10">
+                        {project.tags.map((tag) => (
+                          <span key={tag} className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-[10px] font-mono tracking-widest uppercase text-zinc-400">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      {/* Abstract Bar */}
+                      <div className="absolute bottom-0 left-8 right-8 h-1 bg-zinc-900 rounded-t-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
+                         <div className="w-1/3 h-full bg-blue-500"></div>
+                      </div>
+                    </motion.div>
                   </div>
-                  <h3 className="text-xl font-medium mb-3 text-white">{project.title}</h3>
-                  <p className="text-zinc-400 text-sm leading-relaxed mb-6 font-light">
-                    {project.description}
-                  </p>
-                  {project.image && (
-                    <div className="mb-6 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 aspect-video">
-                      <img 
-                        src={project.image} 
-                        alt={project.title}
-                        className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-wrap gap-2 mt-auto relative z-10">
-                  {project.tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-[10px] font-mono tracking-widest uppercase text-zinc-400">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                {/* Abstract Bar */}
-                <div className="absolute bottom-0 left-8 right-8 h-1 bg-zinc-900 rounded-t-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
-                   <div className="w-1/3 h-full bg-blue-500"></div>
-                </div>
-              </motion.div>
-            ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex justify-center items-center mt-8 space-x-4">
+              <button 
+                onClick={() => setActiveProject(p => p === 0 ? Math.max(0, projects.length - itemsPerViewProject) : p - 1)}
+                className="p-3 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 text-white transition-colors"
+                aria-label="Previous project"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <div className="flex space-x-2">
+                {Array.from({ length: Math.max(1, projects.length - itemsPerViewProject + 1) }).map((_, i) => (
+                  <button 
+                    key={i} 
+                    onClick={() => setActiveProject(i)}
+                    aria-label={`Go to project ${i + 1}`}
+                    className={`h-2.5 rounded-full transition-all duration-300 ${i === activeProject ? 'bg-blue-500 w-8' : 'bg-zinc-700 w-2.5 hover:bg-zinc-500'}`}
+                  />
+                ))}
+              </div>
+              <button 
+                onClick={() => setActiveProject(p => (p + 1) > (projects.length - itemsPerViewProject) ? 0 : p + 1)}
+                className="p-3 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 text-white transition-colors"
+                aria-label="Next project"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Contact Section */}
-      <section className="py-24 bg-[#0a0a0a] text-white">
+      <section className="py-24 bg-transparent text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="bg-blue-600 rounded-3xl p-12 md:p-24 text-center relative overflow-hidden h-full border border-blue-500">
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
