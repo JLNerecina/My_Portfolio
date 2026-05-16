@@ -143,11 +143,34 @@ const LiquidGlass = () => {
   );
 };
 
+// --- LAZY IMAGE COMPONENT ---
+const LazyImage = ({ src, alt, className, containerClassName }: { src: string; alt: string; className?: string; containerClassName?: string }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  return (
+    <div className={`relative overflow-hidden ${containerClassName || ''}`}>
+      {!isLoaded && (
+        <div className="absolute inset-0 bg-zinc-800 animate-pulse flex items-center justify-center">
+          <div className="w-10 h-10 border-2 border-zinc-700 border-t-blue-500 rounded-full animate-spin"></div>
+        </div>
+      )}
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        onLoad={() => setIsLoaded(true)}
+        className={`${className || ''} ${isLoaded ? 'opacity-100' : 'opacity-0'} transition-opacity duration-700`}
+      />
+    </div>
+  );
+};
+
 // Types
 interface Project {
   title: string;
   description: string;
   longDescription: string;
+  features?: string[];
   tags: string[];
   link?: string;
   github?: string;
@@ -217,6 +240,13 @@ export default function App() {
       title: "NEU Library Visitor App",
       description: "Modern web application for managing library visitor logs, tracking entries/exits, generating reports, and improving campus library operations with real-time updates.",
       longDescription: "A comprehensive visitor tracking and management system tailored for the New Era University Library. The system provides an intuitive interface for students and staff to log their visits securely. An admin dashboard helps librarians analyze visitor trends, manage resources better, and oversee library capacity in real-time. Built with a focus on seamless user experience, fast entry processing, and data security.",
+      features: [
+        "Real-time visitor log tracking",
+        "Automated entry/exit processing",
+        "Comprehensive report generation for librarians",
+        "Responsive and intuitive management dashboard",
+        "Secure student and staff authentication"
+      ],
       tags: ["React", "UI/UX", "Database"],
       github: "https://github.com/JLNerecina/NEU-Library-Visitor-App",
       link: "https://remix-neu-library-visitor-app-230692279419.us-west1.run.app/",
@@ -226,6 +256,13 @@ export default function App() {
       title: "NEU MOA Monitoring System",
       description: "Comprehensive monitoring dashboard for tracking Memorandum of Agreement (MOA) status, deadlines, partners, and compliance to streamline university partnerships.",
       longDescription: "A highly specialized monitoring dashboard designed for standardizing and tracking Memorandums of Agreement (MOA) for New Era University. This system digitizes the MOA lifecycle—from drafting to expiration checking. It features automated alerts that notify administrators before critical agreements lapse, ensuring legal compliance and improved inter-departmental visibility. It also provides a clear audit trail of all signed partnerships.",
+      features: [
+        "Digital MOA lifecycle management",
+        "Automated expiration alerts and notifications",
+        "Centralized partner database with compliance tracking",
+        "Inter-departmental visibility and collaboration tools",
+        "Detailed audit trails for legal integrity"
+      ],
       tags: ["Dashboard", "Fullstack", "System"],
       github: "https://github.com/JLNerecina/NEU-MOA-Monitoring-System",
       link: "https://neu-moa-monitoring-system-230692279419.us-west1.run.app/",
@@ -235,6 +272,13 @@ export default function App() {
       title: "CICS Curriculum Map System",
       description: "A Knowledge Management framework designed to visualize and track academic progress, prerequisites, and course relationships for students and admins.",
       longDescription: "An advanced Knowledge Management framework designed to dynamically visualize academic progress. Using D3.js, the framework provides an interactive node-based curriculum map, allowing students and administrators to deeply understand course relationships and prerequisites. It is instrumental in helping students identify bottlenecks in their path and make informed choices about their academic progression.",
+      features: [
+        "Interactive node-based curriculum visualization with D3.js",
+        "Dynamic prerequisite relationship tracking",
+        "Academic progress identification and bottleneck analysis",
+        "Knowledge management framework for educational planning",
+        "Seamless integration for students and academic admins"
+      ],
       tags: ["KM Framework", "D3.js", "Education"],
       github: "https://github.com/JLNerecina/PE2-KM-Curriculum-Map",
       image: "/CICS Curriculum Map.png"
@@ -243,6 +287,13 @@ export default function App() {
       title: "HOPE, Inc. Product Management System",
       description: "A comprehensive product management system for HOPE, Inc., streamlining inventory, sales, and data tracking processes.",
       longDescription: "A scalable, comprehensive product management system specifically developed for HOPE, Inc. to streamline their inventory, sales tracking, and operational processes. Built on a modern tech stack (React & Tailwind on the frontend), this application empowers operations staff to accurately monitor stock levels, manage detailed product lifecycles, and generate insightful business reports. It features robust role-based access control and high-performance data processing.",
+      features: [
+        "Scalable inventory and stock level monitoring",
+        "Real-time sales tracking and product lifecycle management",
+        "Insightful business report generation",
+        "Robust role-based access control (RBAC)",
+        "High-performance frontend and backend integration"
+      ],
       tags: ["Fullstack", "Management System", "Tailwind"],
       github: "https://github.com/fausturnacht/SE2-Zendata-HopePMS",
       image: "/PMS Dashboard.png"
@@ -501,18 +552,31 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-6 items-stretch">
             {/* Image Box */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group h-[300px] lg:h-auto lg:min-h-[400px] flex items-center justify-center">
-              <img 
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group h-[300px] lg:h-auto lg:min-h-[400px] flex items-center justify-center"
+            >
+              <LazyImage 
                 src="/Profile Portfolio.jpg" 
                 alt="John Lian Nerecina"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                containerClassName="absolute inset-0 w-full h-full"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/80 via-transparent to-transparent opacity-60"></div>
               <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors z-20"></div>
-            </div>
+            </motion.div>
             
             {/* Content Box */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-12 flex flex-col justify-center">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+              className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-12 flex flex-col justify-center"
+            >
               <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-6 text-center lg:text-left">About Me</h2>
               <p className="text-base lg:text-lg text-zinc-400 mb-6 leading-relaxed font-light">
                 Currently pursuing my degree at New Era University, I am deeply invested in the ever-evolving landscape of software development. 
@@ -541,7 +605,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -702,11 +766,11 @@ export default function App() {
                         </p>
                         {project.image && (
                           <div className="mb-6 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 aspect-video">
-                            <img 
+                            <LazyImage 
                               src={project.image} 
                               alt={project.title}
+                              containerClassName="w-full h-full"
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                              loading="lazy"
                             />
                           </div>
                         )}
@@ -845,39 +909,104 @@ export default function App() {
               </button>
 
               {expandedProject.image && (
-                <div className="w-full h-64 md:h-96 relative border-b border-zinc-800">
-                  <img src={expandedProject.image} alt={expandedProject.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 to-transparent"></div>
+                <div className="w-full h-[300px] md:h-[450px] relative">
+                  <LazyImage 
+                    src={expandedProject.image} 
+                    alt={expandedProject.title} 
+                    containerClassName="w-full h-full"
+                    className="w-full h-full object-cover" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-[#0a0a0a]/40 to-transparent"></div>
                 </div>
               )}
 
-              <div className="p-8 md:p-12 relative z-10 -mt-16 md:-mt-24">
-                <div className="flex flex-wrap items-center gap-4 mb-6">
-                  {expandedProject.github && (
-                    <a href={expandedProject.github} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 hover:text-white text-zinc-300 text-sm transition-colors">
-                      <Github className="w-4 h-4 mr-2" /> Source Code
-                    </a>
-                  )}
-                  {expandedProject.link && (
-                    <a href={expandedProject.link} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 bg-blue-600 rounded-full hover:bg-blue-500 text-white text-sm transition-colors shadow-lg shadow-blue-900/20">
-                      <ExternalLink className="w-4 h-4 mr-2" /> Live Demo
-                    </a>
-                  )}
-                </div>
-
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">{expandedProject.title}</h2>
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {expandedProject.tags.map((tag) => (
-                    <span key={tag} className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-xs font-mono tracking-widest uppercase text-zinc-400">
-                      {tag}
-                    </span>
-                  ))}
+              <div className="px-8 pb-12 md:px-12 md:pb-16 relative z-10 -mt-20">
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
+                  <div className="flex-1">
+                     <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 text-white">{expandedProject.title}</h2>
+                     <div className="flex flex-wrap gap-2">
+                        {expandedProject.tags.map((tag) => (
+                          <span key={tag} className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg text-[10px] font-mono tracking-widest uppercase text-blue-400">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {expandedProject.github && (
+                      <a href={expandedProject.github} target="_blank" rel="noreferrer" className="inline-flex items-center px-5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 hover:text-white text-zinc-300 text-sm transition-all hover:scale-105 active:scale-95 shadow-xl">
+                        <Github className="w-4 h-4 mr-2" /> Source
+                      </a>
+                    )}
+                    {expandedProject.link && (
+                      <a href={expandedProject.link} target="_blank" rel="noreferrer" className="inline-flex items-center px-5 py-2.5 bg-blue-600 rounded-full hover:bg-blue-500 text-white text-sm transition-all hover:scale-105 active:scale-95 shadow-xl shadow-blue-900/40">
+                        <ExternalLink className="w-4 h-4 mr-2" /> Live Demo
+                      </a>
+                    )}
+                  </div>
                 </div>
                 
-                <h3 className="text-xl font-medium mb-4 text-white">Project Overview</h3>
-                <p className="text-zinc-400 leading-relaxed text-lg font-light">
-                  {expandedProject.longDescription || expandedProject.description}
-                </p>
+                <div className="grid lg:grid-cols-3 gap-12">
+                  <div className="lg:col-span-2 space-y-8">
+                    <section>
+                      <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest mb-4 flex items-center">
+                        <div className="w-8 h-px bg-zinc-800 mr-3"></div>
+                        Project Overview
+                      </h3>
+                      <p className="text-zinc-400 leading-relaxed text-lg font-light">
+                        {expandedProject.longDescription}
+                      </p>
+                    </section>
+
+                    {expandedProject.features && (
+                      <section>
+                        <h3 className="text-sm font-mono text-zinc-500 uppercase tracking-widest mb-6 flex items-center">
+                          <div className="w-8 h-px bg-zinc-800 mr-3"></div>
+                          Key Features
+                        </h3>
+                        <ul className="grid sm:grid-cols-2 gap-4">
+                          {expandedProject.features.map((feature, idx) => (
+                            <li key={idx} className="flex items-start p-4 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl group/feat hover:border-blue-500/30 transition-colors">
+                              <div className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center mr-3 mt-0.5 group-hover/feat:bg-blue-500/20 transition-colors">
+                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                              </div>
+                              <span className="text-sm text-zinc-400 group-hover/feat:text-zinc-300 transition-colors font-light leading-snug">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </section>
+                    )}
+                  </div>
+
+                  <div className="space-y-8">
+                    <div className="p-6 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl backdrop-blur-sm">
+                      <h4 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Tech Stack</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {expandedProject.tags.map((tag) => (
+                          <div key={tag} className="px-3 py-1.5 bg-zinc-800/50 border border-zinc-700/30 rounded-xl text-[10px] text-zinc-400 font-medium">
+                            {tag}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="p-6 bg-blue-600/5 border border-blue-500/10 rounded-3xl">
+                      <h4 className="text-xs font-mono text-blue-500/70 uppercase tracking-widest mb-3 text-center">Ready to explore?</h4>
+                      <div className="flex flex-col gap-3">
+                         {expandedProject.link && (
+                           <a href={expandedProject.link} target="_blank" rel="noreferrer" className="w-full py-3 bg-blue-600 text-white rounded-2xl text-center text-sm font-semibold hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/20">
+                             Launch App
+                           </a>
+                         )}
+                         {expandedProject.github && (
+                           <a href={expandedProject.github} target="_blank" rel="noreferrer" className="w-full py-3 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-2xl text-center text-sm font-semibold hover:bg-zinc-800 transition-colors">
+                             View Repository
+                           </a>
+                         )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
