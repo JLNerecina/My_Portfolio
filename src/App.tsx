@@ -6,6 +6,8 @@ import {
   User, 
   BookOpen, 
   Briefcase,
+  GraduationCap,
+  Download,
   Terminal,
   Cpu,
   Globe,
@@ -222,7 +224,7 @@ export default function App() {
     };
 
     const observer = new IntersectionObserver(observerCallback, observerOptions);
-    const sections = ['home', 'about', 'skills', 'projects'];
+    const sections = ['home', 'about', 'timeline', 'skills', 'projects'];
     sections.forEach(id => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
@@ -234,6 +236,44 @@ export default function App() {
       observer.disconnect();
     };
   }, []);
+
+  const milestones = [
+    {
+      year: "2021",
+      title: "Senior High School Graduation",
+      company: "Academic Milestone",
+      description: "Completed Senior High School with a strong focus on Science, Technology, Engineering, and Mathematics (STEM), laying the foundation for computer science studies.",
+      icon: <BookOpen className="w-5 h-5" />
+    },
+    {
+      year: "2022",
+      title: "Started BSCS at New Era University",
+      company: "Higher Education",
+      description: "Began Bachelor of Science in Computer Science, diving deep into software engineering, database management, and professional web development.",
+      icon: <GraduationCap className="w-5 h-5 text-blue-500" />
+    },
+    {
+      year: "2023",
+      title: "Specialized Project Development",
+      company: "University Innovations",
+      description: "Led the development of key university systems including the NEU Library Visitor App and the MOA Monitoring System, focusing on real-world impact.",
+      icon: <Code2 className="w-5 h-5 text-indigo-400" />
+    },
+    {
+      year: "2024",
+      title: "Advanced KM Frameworks",
+      company: "Curriculum Map Project",
+      description: "Developed the CICS Curriculum Map System using D3.js, providing an advanced Knowledge Management framework for academic visualization.",
+      icon: <LineChart className="w-5 h-5 text-purple-400" />
+    },
+    {
+      year: "Present",
+      title: "Fullstack Developer & Intern",
+      company: "Ongoing Excellence",
+      description: "Currently refining skills in AI orchestration and fullstack development while seeking impactful internship opportunities and collaborations.",
+      icon: <Briefcase className="w-5 h-5 text-green-400" />
+    }
+  ];
 
   const projects: Project[] = [
     {
@@ -419,6 +459,7 @@ export default function App() {
               {[
                 { id: 'home', label: 'Home', icon: <Home className="w-4 h-4" /> },
                 { id: 'about', label: 'About', icon: <User className="w-4 h-4" /> },
+                { id: 'timeline', label: 'Journey', icon: <LineChart className="w-4 h-4" /> },
                 { id: 'skills', label: 'Skills', icon: <Code2 className="w-4 h-4" /> },
                 { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-4 h-4" /> },
               ].map((item) => (
@@ -456,6 +497,7 @@ export default function App() {
             {[
               { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" /> },
               { id: 'about', label: 'About', icon: <User className="w-5 h-5" /> },
+              { id: 'timeline', label: 'Journey', icon: <LineChart className="w-5 h-5" /> },
               { id: 'skills', label: 'Skills', icon: <Code2 className="w-5 h-5" /> },
               { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-5 h-5" /> },
             ].map((item) => (
@@ -605,7 +647,85 @@ export default function App() {
                   </div>
                 </div>
               </div>
+              
+              <div className="mt-10">
+                <a 
+                  href="/Resume-JohnLianNerecina.pdf" 
+                  download="Resume-JohnLianNerecina.pdf"
+                  className="inline-flex items-center px-10 py-4 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-900/20 group"
+                >
+                  <Download className="w-5 h-5 mr-3 group-hover:-translate-y-1 group-hover:animate-bounce transition-transform" />
+                  Download Resume
+                </a>
+              </div>
             </motion.div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Timeline Section */}
+      <section id="timeline" className="py-24 bg-transparent relative">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16 relative">
+             <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">My Journey</h2>
+             <h3 className="text-3xl md:text-5xl font-bold tracking-tight">Timeline & Milestones</h3>
+             <motion.div 
+               initial={{ width: 0 }}
+               whileInView={{ width: 100 }}
+               className="h-1 bg-blue-500 mx-auto mt-6 rounded-full"
+             />
+          </div>
+
+          <div className="relative">
+            {/* Vertical Line */}
+            <div className="absolute left-[21px] md:left-1/2 md:-translate-x-px top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-600/50 via-zinc-800 to-zinc-950/20 md:hidden lg:block"></div>
+            
+            <div className="space-y-12">
+              {milestones.map((milestone, idx) => (
+                <motion.div 
+                  key={idx}
+                  initial={{ opacity: 0, x: idx % 2 === 0 ? 50 : -50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ 
+                    duration: 0.8, 
+                    delay: idx * 0.1,
+                    ease: [0.21, 0.47, 0.32, 0.98] 
+                  }}
+                  className={`relative flex flex-col md:flex-row items-start ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}
+                >
+                  {/* Timeline Dot */}
+                  <div className="absolute left-0 md:left-1/2 md:-translate-x-1/2 top-0 z-10">
+                    <div className="w-11 h-11 bg-[#0a0a0a] border-2 border-zinc-800 rounded-full flex items-center justify-center shadow-2xl">
+                      <div className="w-4 h-4 bg-blue-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+                    </div>
+                  </div>
+
+                  {/* Content Card */}
+                  <div className={`ml-16 md:ml-0 md:w-1/2 ${idx % 2 === 0 ? 'md:pl-16' : 'md:pr-16'}`}>
+                    <div className="group bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/50 p-8 rounded-[2rem] hover:border-blue-500/30 transition-all hover:bg-zinc-900/60 shadow-xl overflow-hidden relative">
+                      {/* Background Glow */}
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none group-hover:bg-blue-500/10 transition-colors"></div>
+                      
+                      <div className="flex items-center space-x-3 mb-4">
+                        <div className="p-2 bg-zinc-800/80 rounded-xl text-zinc-400 group-hover:text-blue-400 group-hover:bg-blue-500/10 transition-all">
+                          {milestone.icon}
+                        </div>
+                        <span className="text-zinc-500 font-mono text-xs tracking-widest uppercase">{milestone.year}</span>
+                      </div>
+                      <h4 className="text-xl font-bold mb-1 text-white group-hover:text-blue-100 transition-colors">{milestone.title}</h4>
+                      <p className="text-blue-500/80 font-medium text-xs mb-4">{milestone.company}</p>
+                      <p className="text-zinc-400 text-sm leading-relaxed font-light">
+                        {milestone.description}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Spacer for MD screens to keep alignment center if using flex-col on small */}
+                  <div className="md:w-1/2 md:block hidden"></div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
