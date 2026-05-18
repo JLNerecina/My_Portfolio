@@ -24,8 +24,10 @@ import {
   FileCode2,
   Star
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
+import Tilt from 'react-parallax-tilt';
+import { GitHubCalendar } from 'react-github-calendar';
 
 // --- LIQUID GLASS COMPONENT ---
 const LiquidGlass = () => {
@@ -201,6 +203,16 @@ export default function App() {
   const [activeProject, setActiveProject] = useState(0);
   const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
+  const [filterCategory, setFilterCategory] = useState("All");
+
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
+  const categories = ["All", "Frontend", "Fullstack", "Data Visualization"];
 
   useEffect(() => {
     const handleResize = () => {
@@ -352,6 +364,17 @@ export default function App() {
     }
   ];
 
+  const filteredProjects = filterCategory === "All" 
+    ? projects 
+    : projects.filter(p => {
+        const cat = filterCategory.toLowerCase();
+        const pTags = p.tags.map(t => t.toLowerCase());
+        if (cat === "frontend") return pTags.some(t => t.includes("react") || t.includes("tailwind") || t.includes("ui"));
+        if (cat === "fullstack") return pTags.some(t => t.includes("fullstack") || t.includes("database") || t.includes("system"));
+        if (cat === "data visualization") return pTags.some(t => t.includes("d3") || t.includes("km"));
+        return pTags.includes(cat);
+      });
+
   const skillGroups = [
     {
       title: "Frontend Development",
@@ -439,6 +462,10 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden moving-gradient text-white font-sans selection:bg-blue-500/30 selection:text-blue-200">
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 origin-left z-[100]"
+      />
       <div className="orb orb-1"></div>
       <div className="orb orb-2"></div>
 
@@ -606,13 +633,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-6 items-stretch">
             {/* Image Box */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group h-[300px] lg:h-auto lg:min-h-[400px] flex items-center justify-center"
-            >
+            <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.02} transitionSpeed={2500} className="bg-zinc-900 border border-zinc-800 rounded-3xl relative overflow-hidden group h-[300px] lg:h-auto lg:min-h-[400px] flex items-center justify-center">
               <LazyImage 
                 src="/Profile Portfolio.jpg" 
                 alt="John Lian Nerecina"
@@ -621,7 +642,7 @@ export default function App() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a]/80 via-transparent to-transparent opacity-60"></div>
               <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors z-20"></div>
-            </motion.div>
+            </Tilt>
             
             {/* Content Box */}
             <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-12 flex flex-col justify-center">
@@ -888,13 +909,61 @@ export default function App() {
         </div>
       </section>
 
+      {/* GitHub Section */}
+      <section id="github" className="py-16 lg:py-24 bg-black/30 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col mb-12 text-center md:text-left">
+            <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">GitHub Contributions</h2>
+            <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light">Consistency and Passion for Coding</p>
+          </div>
+          <Tilt tiltMaxAngleX={2} tiltMaxAngleY={2} scale={1.01} transitionSpeed={2500} className="w-full">
+            <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-8 flex justify-center items-center overflow-hidden shadow-xl max-w-full">
+              <div className="overflow-x-auto w-full flex justify-center py-4 scrollbar-hide">
+                <div className="min-w-max">
+                  <GitHubCalendar 
+                    username="JLNerecina" 
+                    colorScheme="dark"
+                    blockSize={14}
+                    blockMargin={5}
+                    fontSize={14}
+                    theme={{
+                      dark: ['#1e1e1e', '#0e4429', '#006d32', '#26a641', '#39d353']
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </Tilt>
+        </div>
+      </section>
+
       {/* Projects Section */}
       <section id="projects" className="py-16 lg:py-24 bg-black/20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 space-y-6 md:space-y-0 text-center md:text-left">
             <div>
               <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Featured Projects</h2>
-              <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light">Impactful work and technical explorations.</p>
+              <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light mb-6">Impactful work and technical explorations.</p>
+              
+              {/* Project Filters */}
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => {
+                      setFilterCategory(cat);
+                      setActiveProject(0);
+                    }}
+                    className={`px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                      filterCategory === cat
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                        : "bg-zinc-900/50 text-zinc-400 border border-zinc-800 hover:bg-zinc-800 hover:text-white"
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
             <a href="https://github.com/JLNerecina" target="_blank" rel="noreferrer" className="text-blue-500 font-medium flex items-center hover:text-white transition-colors text-sm">
               View all on GitHub <ExternalLink className="w-4 h-4 ml-2" />
@@ -903,17 +972,24 @@ export default function App() {
           <div className="relative max-w-5xl mx-auto">
             <div className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-700 ease-in-out"
+                className="flex transition-transform duration-700 ease-in-out py-8"
                 style={{ transform: `translateX(-${activeProject * (100 / itemsPerViewProject)}%)` }}
               >
-                {projects.map((project, i) => (
-                  <div key={i} className="w-full lg:w-1/2 flex-shrink-0 px-2 lg:px-4">
+                <AnimatePresence mode="popLayout">
+                  {filteredProjects.map((project, i) => (
                     <motion.div 
-                      whileHover={{ y: -8, boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)" }}
-                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                      onClick={() => setExpandedProject(project)}
-                      className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl cursor-pointer shadow-xl"
+                      key={project.title}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full lg:w-1/2 flex-shrink-0 px-2 lg:px-4"
                     >
+                      <Tilt tiltMaxAngleX={4} tiltMaxAngleY={4} scale={1.01} transitionSpeed={2000} className="h-full">
+                        <div 
+                          onClick={() => setExpandedProject(project)}
+                          className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl cursor-pointer shadow-xl"
+                        >
                       <div className="relative z-10">
                         <div className="flex justify-between items-start mb-6">
                           <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-500 transition-colors">
@@ -971,23 +1047,25 @@ export default function App() {
                       <div className="absolute bottom-0 left-8 right-8 h-1 bg-zinc-900 rounded-t-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
                          <div className="w-1/3 h-full bg-blue-500"></div>
                       </div>
+                        </div>
+                      </Tilt>
                     </motion.div>
-                  </div>
-                ))}
+                  ))}
+                </AnimatePresence>
               </div>
             </div>
 
             {/* Controls */}
             <div className="flex justify-center items-center mt-8 space-x-4">
               <button 
-                onClick={() => setActiveProject(p => p === 0 ? Math.max(0, projects.length - itemsPerViewProject) : p - 1)}
+                onClick={() => setActiveProject(p => p === 0 ? Math.max(0, filteredProjects.length - itemsPerViewProject) : p - 1)}
                 className="p-3 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 text-white transition-colors"
                 aria-label="Previous project"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <div className="flex space-x-2">
-                {Array.from({ length: Math.max(1, projects.length - itemsPerViewProject + 1) }).map((_, i) => (
+                {Array.from({ length: Math.max(1, filteredProjects.length - itemsPerViewProject + 1) }).map((_, i) => (
                   <button 
                     key={i} 
                     onClick={() => setActiveProject(i)}
@@ -997,7 +1075,7 @@ export default function App() {
                 ))}
               </div>
               <button 
-                onClick={() => setActiveProject(p => (p + 1) > (projects.length - itemsPerViewProject) ? 0 : p + 1)}
+                onClick={() => setActiveProject(p => (p + 1) > (filteredProjects.length - itemsPerViewProject) ? 0 : p + 1)}
                 className="p-3 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 text-white transition-colors"
                 aria-label="Next project"
               >
@@ -1020,18 +1098,26 @@ export default function App() {
               <h2 className="text-4xl md:text-6xl font-bold mb-8 tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-200">
                 Ready to start a project?
               </h2>
-              <p className="text-lg md:text-xl text-zinc-300 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+              <p className="text-lg md:text-xl text-zinc-300 mb-8 max-w-2xl mx-auto font-light leading-relaxed">
                 I'm currently looking for new opportunities and collaborations. 
                 Whether you have a question or just want to say hi, my inbox is always open.
               </p>
-              <div className="flex flex-col md:flex-row justify-center items-center gap-6">
-                <a 
-                  href="mailto:johnlian.nerecina@neu.edu.ph"
-                  className="w-full md:w-auto px-10 py-5 bg-white text-black font-semibold rounded-full hover:bg-blue-500 hover:text-white active:scale-95 transition-all text-base shadow-2xl shadow-white/10"
-                >
-                  Email Me Direct
-                </a>
-                <div className="flex gap-4">
+              
+              <div className="max-w-lg mx-auto bg-black/40 p-8 rounded-3xl border border-white/5 mb-8 backdrop-blur-md">
+                <form className="flex flex-col gap-4 text-left">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Your Name" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" />
+                    <input type="email" placeholder="Your Email" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" />
+                  </div>
+                  <input type="text" placeholder="Subject" className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all" />
+                  <textarea placeholder="Your Message" rows={4} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all resize-none"></textarea>
+                  <button type="button" onClick={() => window.location.href='mailto:johnlian.nerecina@neu.edu.ph'} className="mt-2 w-full py-4 bg-white text-black font-semibold rounded-xl hover:bg-blue-500 hover:text-white active:scale-95 transition-all text-sm shadow-xl shadow-blue-500/10">
+                    Send Message
+                  </button>
+                </form>
+              </div>
+
+              <div className="flex justify-center items-center gap-4">
                   <a 
                     href="https://linkedin.com/in/john-lian-nerecina-042744286" 
                     target="_blank"
@@ -1049,7 +1135,6 @@ export default function App() {
                     <Github className="w-6 h-6 text-zinc-400 group-hover:text-white" />
                   </a>
                 </div>
-              </div>
             </div>
           </div>
         </div>
