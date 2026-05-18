@@ -19,7 +19,10 @@ import {
   PenTool,
   ChevronLeft,
   ChevronRight,
-  X
+  X,
+  GitCommit,
+  FileCode2,
+  Star
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
@@ -177,6 +180,11 @@ interface Project {
   link?: string;
   github?: string;
   image?: string;
+  stats?: {
+    loc: string;
+    commits: number;
+    stars: number;
+  };
 }
 
 interface Skill {
@@ -290,7 +298,8 @@ export default function App() {
       tags: ["React", "UI/UX", "Database"],
       github: "https://github.com/JLNerecina/NEU-Library-Visitor-App",
       link: "https://remix-neu-library-visitor-app-230692279419.us-west1.run.app/",
-      image: "/NEU Library Visitor App Preview 1.png"
+      image: "/NEU Library Visitor App Preview 1.png",
+      stats: { loc: "3.2k", commits: 24, stars: 0 }
     },
     {
       title: "NEU MOA Monitoring System",
@@ -306,7 +315,8 @@ export default function App() {
       tags: ["Dashboard", "Fullstack", "System"],
       github: "https://github.com/JLNerecina/NEU-MOA-Monitoring-System",
       link: "https://neu-moa-monitoring-system-230692279419.us-west1.run.app/",
-      image: "/NEU MOA Monitoring System Preview.png"
+      image: "/NEU MOA Monitoring System Preview.png",
+      stats: { loc: "600+", commits: 12, stars: 0 }
     },
     {
       title: "CICS Curriculum Map System",
@@ -321,7 +331,8 @@ export default function App() {
       ],
       tags: ["KM Framework", "D3.js", "Education"],
       github: "https://github.com/JLNerecina/PE2-KM-Curriculum-Map",
-      image: "/CICS Curriculum Map.png"
+      image: "/CICS Curriculum Map.png",
+      stats: { loc: "4.2k", commits: 48, stars: 3 }
     },
     {
       title: "HOPE, Inc. Product Management System",
@@ -336,7 +347,8 @@ export default function App() {
       ],
       tags: ["Fullstack", "Management System", "Tailwind"],
       github: "https://github.com/fausturnacht/SE2-Zendata-HopePMS",
-      image: "/PMS Dashboard.png"
+      image: "/PMS Dashboard.png",
+      stats: { loc: "10.6k", commits: 115, stars: 3 }
     }
   ];
 
@@ -612,23 +624,43 @@ export default function App() {
             </motion.div>
             
             {/* Content Box */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
-              className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-12 flex flex-col justify-center"
-            >
-              <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-6 text-center lg:text-left">About Me</h2>
-              <p className="text-base lg:text-lg text-zinc-400 mb-6 leading-relaxed font-light">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 md:p-12 flex flex-col justify-center">
+              <motion.h2 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-6 text-center lg:text-left"
+              >
+                About Me
+              </motion.h2>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="text-base lg:text-lg text-zinc-400 mb-6 leading-relaxed font-light"
+              >
                 Currently pursuing my degree at New Era University, I am deeply invested in the ever-evolving landscape of software development. 
                 My journey began with a curiosity for how systems work, which quickly turned into a passion for creating impactful applications.
-              </p>
-              <p className="text-base lg:text-lg text-zinc-400 mb-8 leading-relaxed font-light">
+              </motion.p>
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                className="text-base lg:text-lg text-zinc-400 mb-8 leading-relaxed font-light"
+              >
                 I believe in clean code, continuous learning, and the power of technology to solve real-world problems. 
-              </p>
+              </motion.p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex items-center text-zinc-300">
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.5 }}
+                  className="flex items-center text-zinc-300"
+                >
                   <div className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center mr-4">
                     <BookOpen className="w-5 h-5 text-blue-500" />
                   </div>
@@ -636,8 +668,14 @@ export default function App() {
                     <div className="font-semibold text-sm">Education</div>
                     <div className="text-xs text-zinc-500 font-mono">BSCS, NEU</div>
                   </div>
-                </div>
-                <div className="flex items-center text-zinc-300">
+                </motion.div>
+                <motion.div 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.6 }}
+                  className="flex items-center text-zinc-300"
+                >
                   <div className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center mr-4">
                     <Briefcase className="w-5 h-5 text-blue-500" />
                   </div>
@@ -645,10 +683,16 @@ export default function App() {
                     <div className="font-semibold text-sm">Status</div>
                     <div className="text-xs text-zinc-500 font-mono">Internships</div>
                   </div>
-                </div>
+                </motion.div>
               </div>
               
-              <div className="mt-10">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.5, delay: 0.7 }}
+                className="mt-10"
+              >
                 <a 
                   href="/Resume-JohnLianNerecina.pdf" 
                   download="Resume-JohnLianNerecina.pdf"
@@ -657,8 +701,8 @@ export default function App() {
                   <Download className="w-5 h-5 mr-3 group-hover:-translate-y-1 group-hover:animate-bounce transition-transform" />
                   Download Resume
                 </a>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -884,6 +928,27 @@ export default function App() {
                         <p className="text-zinc-400 text-sm leading-relaxed mb-6 font-light">
                           {project.description}
                         </p>
+                        
+                        {project.stats && (
+                          <div className="grid grid-cols-3 gap-3 mb-6 relative z-10">
+                            <div className="flex flex-col items-center justify-center p-3 bg-zinc-900 border border-zinc-800/80 rounded-xl hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 transition-all cursor-default group/stat">
+                              <FileCode2 className="w-5 h-5 text-zinc-500 group-hover/stat:text-blue-400 mb-2 transition-colors" />
+                              <span className="text-sm font-medium text-zinc-300 group-hover/stat:text-blue-100 transition-colors">{project.stats.loc}</span>
+                              <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1 group-hover/stat:text-blue-400/70">LOC</span>
+                            </div>
+                            <div className="flex flex-col items-center justify-center p-3 bg-zinc-900 border border-zinc-800/80 rounded-xl hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-default group/stat">
+                              <GitCommit className="w-5 h-5 text-zinc-500 group-hover/stat:text-emerald-400 mb-2 transition-colors" />
+                              <span className="text-sm font-medium text-zinc-300 group-hover/stat:text-emerald-100 transition-colors">{project.stats.commits}</span>
+                              <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1 group-hover/stat:text-emerald-400/70">Commits</span>
+                            </div>
+                            <div className="flex flex-col items-center justify-center p-3 bg-zinc-900 border border-zinc-800/80 rounded-xl hover:border-amber-500/50 hover:bg-amber-500/5 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/10 transition-all cursor-default group/stat">
+                              <Star className="w-5 h-5 text-zinc-500 group-hover/stat:text-amber-400 mb-2 transition-colors" />
+                              <span className="text-sm font-medium text-zinc-300 group-hover/stat:text-amber-100 transition-colors">{project.stats.stars}</span>
+                              <span className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1 group-hover/stat:text-amber-400/70">Stars</span>
+                            </div>
+                          </div>
+                        )}
+
                         {project.image && (
                           <div className="mb-6 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/50 aspect-video">
                             <LazyImage 
@@ -1099,6 +1164,35 @@ export default function App() {
                   </div>
 
                   <div className="space-y-8">
+                    {expandedProject.stats && (
+                      <div className="p-6 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl backdrop-blur-sm">
+                        <h4 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Project Stats</h4>
+                        <div className="flex flex-col gap-4">
+                           <div className="flex items-center justify-between text-zinc-300">
+                             <div className="flex items-center gap-2">
+                               <FileCode2 className="w-4 h-4 text-zinc-500" />
+                               <span className="text-sm">Lines of Code</span>
+                             </div>
+                             <span className="text-sm font-mono">{expandedProject.stats.loc}</span>
+                           </div>
+                           <div className="flex items-center justify-between text-zinc-300">
+                             <div className="flex items-center gap-2">
+                               <GitCommit className="w-4 h-4 text-zinc-500" />
+                               <span className="text-sm">Commits</span>
+                             </div>
+                             <span className="text-sm font-mono">{expandedProject.stats.commits}</span>
+                           </div>
+                           <div className="flex items-center justify-between text-zinc-300">
+                             <div className="flex items-center gap-2">
+                               <Star className="w-4 h-4 text-zinc-500" />
+                               <span className="text-sm">Stars</span>
+                             </div>
+                             <span className="text-sm font-mono">{expandedProject.stats.stars}</span>
+                           </div>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="p-6 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl backdrop-blur-sm">
                       <h4 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Tech Stack</h4>
                       <div className="flex flex-wrap gap-2">
