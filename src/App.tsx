@@ -205,12 +205,22 @@ export default function App() {
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
   const [filterCategory, setFilterCategory] = useState("All");
 
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001
   });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
   const categories = ["All", "Frontend", "Fullstack", "Data Visualization"];
 
@@ -259,35 +269,35 @@ export default function App() {
 
   const milestones = [
     {
-      year: "2021",
+      year: "2023",
       title: "Senior High School Graduation",
       company: "Academic Milestone",
       description: "Completed Senior High School with a strong focus on Science, Technology, Engineering, and Mathematics (STEM), laying the foundation for computer science studies.",
       icon: <BookOpen className="w-5 h-5" />
     },
     {
-      year: "2022",
+      year: "2023",
       title: "Started BSCS at New Era University",
       company: "Higher Education",
       description: "Began Bachelor of Science in Computer Science, diving deep into software engineering, database management, and professional web development.",
       icon: <GraduationCap className="w-5 h-5 text-blue-500" />
     },
     {
-      year: "2023",
+      year: "2025",
       title: "Specialized Project Development",
       company: "University Innovations",
       description: "Led the development of key university systems including the NEU Library Visitor App and the MOA Monitoring System, focusing on real-world impact.",
       icon: <Code2 className="w-5 h-5 text-indigo-400" />
     },
     {
-      year: "2024",
+      year: "2026",
       title: "Advanced KM Frameworks",
       company: "Curriculum Map Project",
       description: "Developed the CICS Curriculum Map System using D3.js, providing an advanced Knowledge Management framework for academic visualization.",
       icon: <LineChart className="w-5 h-5 text-purple-400" />
     },
     {
-      year: "Present",
+      year: "2026",
       title: "Fullstack Developer & Intern",
       company: "Ongoing Excellence",
       description: "Currently refining skills in AI orchestration and fullstack development while seeking impactful internship opportunities and collaborations.",
@@ -462,6 +472,12 @@ export default function App() {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden moving-gradient text-white font-sans selection:bg-blue-500/30 selection:text-blue-200">
+      <div 
+        className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300"
+        style={{ 
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(59, 130, 246, 0.08), transparent 40%)` 
+        }}
+      />
       <motion.div
         style={{ scaleX }}
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 origin-left z-[100]"
@@ -1004,6 +1020,16 @@ export default function App() {
                         <p className="text-zinc-400 text-sm leading-relaxed mb-6 font-light">
                           {project.description}
                         </p>
+                        
+                        {project.tags && project.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-6">
+                            {project.tags.map((tag, tagIdx) => (
+                              <span key={tagIdx} className="px-2.5 py-1 bg-zinc-800/50 border border-zinc-700/50 rounded-md text-xs font-medium text-zinc-300">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                         
                         {project.stats && (
                           <div className="grid grid-cols-3 gap-3 mb-6 relative z-10">
