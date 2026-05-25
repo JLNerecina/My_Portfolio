@@ -28,6 +28,7 @@ import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import Tilt from 'react-parallax-tilt';
 import { GitHubCalendar } from 'react-github-calendar';
+import { GitHubStats } from './components/GitHubStats';
 
 // --- LIQUID GLASS COMPONENT ---
 const LiquidGlass = () => {
@@ -932,6 +933,10 @@ export default function App() {
             <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">GitHub Contributions</h2>
             <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light">Consistency and Passion for Coding</p>
           </div>
+          
+          {/* GitHub Overview and Top Languages Metric Cards */}
+          <GitHubStats />
+
           <Tilt tiltMaxAngleX={2} tiltMaxAngleY={2} scale={1.01} transitionSpeed={2500} className="w-full">
             <div className="bg-[#121212] border border-zinc-800 rounded-3xl p-8 flex justify-center items-center overflow-hidden shadow-xl max-w-full">
               <div className="overflow-x-auto w-full flex justify-center py-4 scrollbar-hide">
