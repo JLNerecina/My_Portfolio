@@ -174,6 +174,16 @@ const LazyImage = ({ src, alt, className, containerClassName }: { src: string; a
 };
 
 // Types
+interface Article {
+  title: string;
+  excerpt: string;
+  content?: string;
+  date: string;
+  readTime: string;
+  tags: string[];
+  link?: string;
+}
+
 interface Project {
   title: string;
   description: string;
@@ -204,15 +214,22 @@ export default function App() {
   const [activeProject, setActiveProject] = useState(0);
   const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
+  const [expandedArticle, setExpandedArticle] = useState<Article | null>(null);
   const [filterCategory, setFilterCategory] = useState("All");
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const articlesRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001
+  });
+
+  const { scrollYProgress: articlesScrollProgress } = useScroll({
+    target: articlesRef,
+    offset: ["start center", "end center"]
   });
 
   useEffect(() => {
@@ -471,6 +488,36 @@ export default function App() {
     }
   ];
 
+  const articles: Article[] = [
+    {
+      title: "Building Modern React Portfolios",
+      excerpt: "A deep dive into crafting 3D tilt effects, parallax scrolling, and optimizing glassmorphism interfaces in modern React 18+.",
+      content: "When building a modern portfolio, performance and visual impact go hand-in-hand. By leveraging React 18's concurrent features, alongside Framer Motion for buttery-smooth animations, we can craft experiences that feel alive. \n\nWe extensively use `react-parallax-tilt` to give depth to cards, making the user interface tactile and interactive. Combining this with CSS backdrop filters allows for beautiful glassmorphism that perfectly meshes with dark, cosmic themes.",
+      date: "May 25, 2026",
+      readTime: "5 min read",
+      tags: ["React", "UI/UX", "Tailwind CSS"],
+      link: "#"
+    },
+    {
+      title: "Understanding Vite's Fast HMR",
+      excerpt: "How Vite achieves its incredibly fast Hot Module Replacement by leveraging native ES modules in the browser.",
+      content: "Traditional bundlers like Webpack build the entire application before serving it, which leads to slow startup times and delayed Hot Module Replacement (HMR) as project size grows. Vite fundamentally changes this paradigm.\n\nBy leveraging native ES modules in the browser, Vite serves source code directly and only transforms files as they are requested. This means HMR updates are virtually instantaneous regardless of application size, providing an unparalleled developer experience.",
+      date: "Apr 12, 2026",
+      readTime: "7 min read",
+      tags: ["Vite", "Build Tools", "Performance"],
+      link: "#"
+    },
+    {
+      title: "The Art of Data Visualization with D3.js",
+      excerpt: "Bridging the gap between raw data and meaningful insights using powerful SVG manipulations and data joining.",
+      content: "Data visualization is more than just drawing charts; it's about telling a compelling story with data. D3.js (Data-Driven Documents) provides the low-level primitives necessary to bind arbitrary data to exactly crafted DOM representations.\n\nIn my recent projects, wrapping D3 up in React components allowed me to seamlessly combine React's declarative rendering with D3's sophisticated math and scaling utilities, resulting in interactive maps and deep hierarchical data visualizations.",
+      date: "Mar 10, 2026",
+      readTime: "6 min read",
+      tags: ["D3.js", "Data Visualization", "JavaScript"],
+      link: "#"
+    }
+  ];
+
   return (
     <div className="min-h-screen relative overflow-x-hidden moving-gradient text-white font-sans selection:bg-blue-500/30 selection:text-blue-200">
       <div 
@@ -506,11 +553,11 @@ export default function App() {
             className="pointer-events-auto shadow-lg flex items-center space-x-3"
           >
             <img src="/My Logo - JLN.png" alt="JLN Logo" className="h-10 md:h-12 object-contain rounded-full shadow-[0_0_15px_rgba(255,255,255,0.2)]" />
-            <span className="text-xs md:text-sm font-bold uppercase tracking-widest text-white/90 hidden sm:block">Online Portfolio</span>
+            <span className="text-xs lg:text-sm font-bold uppercase tracking-widest text-white/90 hidden sm:block">Online Portfolio</span>
           </motion.div>
           
           {/* Main Navigation - Integrated horizontally on Desktop */}
-          <nav className="hidden md:flex flex-1 justify-center pointer-events-auto">
+          <nav className="hidden lg:flex flex-1 justify-center pointer-events-auto mx-4">
             <ul className="glass-nav-container !rounded-full py-1.5 px-3">
               {[
                 { id: 'home', label: 'Home', icon: <Home className="w-4 h-4" /> },
@@ -518,6 +565,7 @@ export default function App() {
                 { id: 'timeline', label: 'Journey', icon: <LineChart className="w-4 h-4" /> },
                 { id: 'skills', label: 'Skills', icon: <Code2 className="w-4 h-4" /> },
                 { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-4 h-4" /> },
+                { id: 'articles', label: 'Articles', icon: <BookOpen className="w-4 h-4" /> },
               ].map((item) => (
                 <li 
                   key={item.id} 
@@ -526,10 +574,10 @@ export default function App() {
                   <a 
                     href={`#${item.id}`}
                     onClick={() => setActiveSection(item.id)}
-                    className="glass-nav-item !h-[45px] !w-[80px]"
+                    className="glass-nav-item !h-[45px] lg:!w-[70px] xl:!w-[80px]"
                   >
                     <div className="glass-nav-content">
-                      <span className="glass-nav-text text-xs">{item.label}</span>
+                      <span className="glass-nav-text text-[11px] xl:text-xs">{item.label}</span>
                       <span className="glass-nav-icon">{item.icon}</span>
                     </div>
                   </a>
@@ -541,14 +589,14 @@ export default function App() {
           {/* Contact Button */}
           <a 
             href="mailto:johnlian.nerecina@neu.edu.ph"
-            className="bg-white/10 border border-white/20 backdrop-blur-md text-white px-5 py-2.5 rounded-full hover:bg-white hover:text-black transition-all text-xs font-mono uppercase tracking-widest shadow-xl ml-auto md:ml-0"
+            className="bg-white/10 border border-white/20 backdrop-blur-md text-white px-5 py-2.5 rounded-full hover:bg-white hover:text-black transition-all text-xs font-mono uppercase tracking-widest shadow-xl ml-auto lg:ml-0"
           >
             Get in Touch
           </a>
         </div>
         
         {/* Mobile Navbar sticking to bottom */}
-        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] md:hidden flex justify-center pointer-events-auto">
+        <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[95%] lg:hidden flex justify-center pointer-events-auto">
           <ul className="glass-nav-container w-full justify-around !rounded-2xl">
             {[
               { id: 'home', label: 'Home', icon: <Home className="w-5 h-5" /> },
@@ -556,6 +604,7 @@ export default function App() {
               { id: 'timeline', label: 'Journey', icon: <LineChart className="w-5 h-5" /> },
               { id: 'skills', label: 'Skills', icon: <Code2 className="w-5 h-5" /> },
               { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-5 h-5" /> },
+              { id: 'articles', label: 'Articles', icon: <BookOpen className="w-5 h-5" /> },
             ].map((item) => (
               <li 
                 key={item.id} 
@@ -732,8 +781,8 @@ export default function App() {
                 className="mt-10"
               >
                 <a 
-                  href="/Resume-JohnLianNerecina.pdf" 
-                  download="Resume-JohnLianNerecina.pdf"
+                  href="/John_Lian_Nerecina_Resume.pdf" 
+                  download="John_Lian_Nerecina_Resume.pdf"
                   className="inline-flex items-center px-10 py-4 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-500 transition-all active:scale-95 shadow-lg shadow-blue-900/20 group"
                 >
                   <Download className="w-5 h-5 mr-3 group-hover:-translate-y-1 group-hover:animate-bounce transition-transform" />
@@ -1117,6 +1166,78 @@ export default function App() {
         </div>
       </section>
 
+      {/* Articles / Tech Blog Section */}
+      <section id="articles" ref={articlesRef} className="py-16 lg:py-24 relative z-10">
+        <div className="max-w-7xl mx-auto px-6 relative h-full">
+          
+          {/* Sticky/Fixed-style progress pill for the section */}
+          <div className="sticky top-24 z-50 flex justify-end w-full h-0 pointer-events-none mb-12 lg:mb-0">
+             <div className="pointer-events-auto flex items-center gap-4 bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 px-5 py-2.5 rounded-full shadow-lg -mt-16 lg:mt-0 lg:-translate-y-3">
+               <div className="flex items-center gap-2">
+                 <BookOpen className="w-3.5 h-3.5 text-blue-500" />
+                 <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mt-0.5">Feed Progress</span>
+               </div>
+               <div className="w-24 md:w-32 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                 <motion.div 
+                   style={{ scaleX: articlesScrollProgress, transformOrigin: 'left' }}
+                   className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
+                 />
+               </div>
+             </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row justify-between items-start mb-12 relative z-20 pointer-events-none">
+            <div className="flex flex-col pointer-events-auto">
+              <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Tech Blog</h2>
+              <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light">Insights, tutorials, and development logs.</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map((article, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="h-full"
+              >
+                <Tilt tiltMaxAngleX={3} tiltMaxAngleY={3} scale={1.02} transitionSpeed={2000} className="h-full">
+                  <div 
+                    onClick={() => setExpandedArticle(article)}
+                    className="cursor-pointer flex flex-col h-full bg-[#121212]/80 border border-zinc-800/80 rounded-3xl p-8 hover:border-zinc-700/60 shadow-xl transition-all group"
+                  >
+                    <div className="flex justify-between items-start mb-6">
+                      <span className="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-[10px] font-mono tracking-widest uppercase">
+                        {article.tags[0]}
+                      </span>
+                      <span className="text-xs font-mono text-zinc-500 flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5" />
+                        {article.readTime}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-blue-400 transition-colors leading-snug">
+                      {article.title}
+                    </h3>
+                    
+                    <p className="text-zinc-400 font-light text-sm leading-relaxed mb-6 flex-grow">
+                      {article.excerpt}
+                    </p>
+                    
+                    <div className="flex items-center justify-between pt-6 border-t border-zinc-800/60 mt-auto">
+                      <span className="text-xs font-mono text-zinc-500">{article.date}</span>
+                      <ExternalLink className="w-4 h-4 text-zinc-600 group-hover:text-blue-400 transition-colors" />
+                    </div>
+                  </div>
+                </Tilt>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section id="contact" className="py-24 bg-transparent text-white relative z-10">
         <div className="max-w-7xl mx-auto px-6">
@@ -1337,6 +1458,64 @@ export default function App() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Article Modal */}
+      <AnimatePresence>
+        {expandedArticle && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm"
+            onClick={() => setExpandedArticle(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-zinc-950 border border-zinc-800 rounded-[2rem] w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button 
+                onClick={() => setExpandedArticle(null)}
+                className="absolute top-6 right-6 p-2 bg-zinc-900 hover:bg-zinc-800 rounded-full text-zinc-400 hover:text-white transition-colors z-20"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="p-8 md:p-12 relative z-10 pt-16">
+                <div className="flex flex-col gap-6 mb-10">
+                  <div className="flex items-center gap-4 text-xs font-mono text-zinc-500 uppercase tracking-widest">
+                    <span>{expandedArticle.date}</span>
+                    <span className="w-1 h-1 bg-zinc-700 rounded-full"></span>
+                    <span className="flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> {expandedArticle.readTime}</span>
+                  </div>
+                  
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">
+                    {expandedArticle.title}
+                  </h2>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {expandedArticle.tags.map((tag) => (
+                      <span key={tag} className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg text-[10px] font-mono tracking-widest uppercase text-blue-400">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="w-full h-px bg-zinc-800/80 mb-10"></div>
+                
+                <article className="prose prose-invert prose-zinc max-w-none text-zinc-300 font-light leading-loose">
+                  {expandedArticle.content?.split('\n').map((paragraph, idx) => (
+                    <p key={idx} className="mb-6">{paragraph}</p>
+                  ))}
+                </article>
               </div>
             </motion.div>
           </motion.div>
