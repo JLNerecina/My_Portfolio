@@ -22,7 +22,12 @@ import {
   X,
   GitCommit,
   FileCode2,
-  Star
+  Star,
+  Twitter,
+  Heart,
+  ThumbsUp,
+  MessageCircle,
+  MoreHorizontal
 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
@@ -184,6 +189,15 @@ interface Article {
   link?: string;
 }
 
+interface LinkedInPost {
+  id: string;
+  author: string;
+  role: string;
+  date: string;
+  content: string;
+  link: string;
+}
+
 interface Project {
   title: string;
   description: string;
@@ -215,6 +229,8 @@ export default function App() {
   const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
   const [expandedArticle, setExpandedArticle] = useState<Article | null>(null);
+  const [comments, setComments] = useState<{ [title: string]: { id: number; author: string; text: string; date: string; likes: number; isLiked: boolean }[] }>({});
+  const [newComment, setNewComment] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -488,6 +504,25 @@ export default function App() {
     }
   ];
 
+  const linkedInPosts: LinkedInPost[] = [
+    {
+      id: "1",
+      author: "John Lian Nerecina",
+      role: "Fullstack Developer",
+      date: "Recently",
+      content: "I'm thrilled to share my newly updated interactive portfolio! It features 3D hover effects, smooth Framer Motion page transitions, and dynamically integrates with the GitHub API to showcase my activity. Built using React, Vite, and Tailwind CSS. Feel free to explore my work and let me know your thoughts!",
+      link: "https://www.linkedin.com/in/john-lian-nerecina-042744286"
+    },
+    {
+      id: "2",
+      author: "John Lian Nerecina",
+      role: "Fullstack Developer",
+      date: "1 month ago",
+      content: "Just wrapped up a deep dive into building performant user interfaces with D3.js and React. Creating scalable, data-driven applications is incredibly rewarding. Check out my latest article on how I integrate these technologies for smooth data visualization.",
+      link: "https://www.linkedin.com/in/john-lian-nerecina-042744286"
+    }
+  ];
+
   const articles: Article[] = [
     {
       title: "Building Modern React Portfolios",
@@ -517,6 +552,46 @@ export default function App() {
       link: "#"
     }
   ];
+
+  const handleAddComment = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim() || !expandedArticle) return;
+    
+    const comment = {
+      id: Date.now(),
+      author: "Guest User",
+      text: newComment,
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      likes: 0,
+      isLiked: false
+    };
+    
+    setComments(prev => ({
+      ...prev,
+      [expandedArticle.title]: [...(prev[expandedArticle.title] || []), comment]
+    }));
+    
+    setNewComment("");
+  };
+
+  const handleToggleLike = (articleTitle: string, commentId: number) => {
+    setComments(prev => {
+      const articleComments = prev[articleTitle] || [];
+      return {
+        ...prev,
+        [articleTitle]: articleComments.map(comment => {
+          if (comment.id === commentId) {
+            return {
+              ...comment,
+              isLiked: !comment.isLiked,
+              likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
+            };
+          }
+          return comment;
+        })
+      };
+    });
+  };
 
   return (
     <div className="min-h-screen relative overflow-x-hidden moving-gradient text-white font-sans selection:bg-blue-500/30 selection:text-blue-200">
@@ -1238,6 +1313,74 @@ export default function App() {
         </div>
       </section>
 
+      {/* LinkedIn Featured Posts Section */}
+      <section id="linkedin-posts" className="py-16 lg:py-24 bg-black/40 backdrop-blur-sm relative z-10 border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-12 space-y-4 md:space-y-0 text-center md:text-left">
+            <div>
+              <h2 className="text-xs font-mono text-blue-500 uppercase tracking-widest mb-4 flex items-center justify-center md:justify-start">
+                <Linkedin className="w-4 h-4 mr-2" /> LinkedIn Activity
+              </h2>
+              <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light">
+                Professional updates, milestones, and development insights.
+              </p>
+            </div>
+            <a 
+              href="https://www.linkedin.com/in/john-lian-nerecina-042744286" 
+              target="_blank" 
+              rel="noreferrer"
+              className="inline-flex items-center px-6 py-2.5 bg-[#0a66c2]/10 border border-[#0a66c2]/30 text-[#0a66c2] hover:bg-[#0a66c2] hover:text-white rounded-full text-sm font-semibold transition-all shadow-lg hover:shadow-[#0a66c2]/30"
+            >
+              View Full Profile <ChevronRight className="w-4 h-4 ml-2" />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {linkedInPosts.map((post, index) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                className="bg-[#121212]/80 border border-zinc-800/80 rounded-[2rem] p-6 sm:p-8 hover:border-zinc-700/60 shadow-xl transition-all flex flex-col h-full"
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-4">
+                    <img src="/My Logo - JLN.png" alt={post.author} className="w-12 h-12 rounded-full object-contain bg-black/60 p-1 border border-zinc-700/50" />
+                    <div>
+                      <h4 className="text-white font-semibold flex items-center leading-tight">
+                        {post.author}
+                        <span className="w-1 h-1 bg-zinc-600 rounded-full mx-2 hidden sm:block"></span>
+                        <span className="text-[10px] text-zinc-500 font-normal hidden sm:block">1st</span>
+                      </h4>
+                      <p className="text-xs text-zinc-400 font-light mt-0.5">{post.role}</p>
+                      <p className="text-[10px] text-zinc-500 font-mono mt-1">{post.date}</p>
+                    </div>
+                  </div>
+                  <MoreHorizontal className="w-5 h-5 text-zinc-500" />
+                </div>
+
+                <div className="text-zinc-300 font-light text-sm leading-relaxed mb-8 flex-grow whitespace-pre-line">
+                  {post.content}
+                </div>
+
+                <div className="mt-auto pt-4 border-t border-zinc-800/60">
+                  <a 
+                    href={post.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center justify-center w-full py-3 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-sm font-semibold hover:bg-zinc-800 transition-colors gap-2"
+                  >
+                    View Post on LinkedIn
+                  </a>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Contact Section */}
       <section id="contact" className="py-24 bg-transparent text-white relative z-10">
         <div className="max-w-7xl mx-auto px-6">
@@ -1516,6 +1659,92 @@ export default function App() {
                     <p key={idx} className="mb-6">{paragraph}</p>
                   ))}
                 </article>
+
+                {/* Social Share */}
+                <div className="flex items-center gap-4 pt-10 mt-10 border-t border-zinc-800/80">
+                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Share Article</span>
+                  <a 
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(expandedArticle.title)}&url=${encodeURIComponent(window.location.href)}`}
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="p-2.5 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-400 hover:text-white hover:bg-blue-400 hover:border-blue-500/50 transition-all shadow-sm hover:shadow-blue-500/20"
+                    aria-label="Share on Twitter"
+                  >
+                    <Twitter className="w-4 h-4" />
+                  </a>
+                  <a 
+                    href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(expandedArticle.title)}`}
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="p-2.5 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-400 hover:text-white hover:bg-blue-600 hover:border-blue-500/50 transition-all shadow-sm hover:shadow-blue-600/20"
+                    aria-label="Share on LinkedIn"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                </div>
+
+                {/* Comments Section */}
+                <div className="pt-10 mt-10 border-t border-zinc-800/80">
+                  <h3 className="text-xl font-bold tracking-tight text-white mb-6">Comments</h3>
+                  
+                  <div className="space-y-6 mb-8">
+                    {comments[expandedArticle.title]?.length > 0 ? (
+                      comments[expandedArticle.title].map((comment) => (
+                        <div key={comment.id} className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
+                          <div className="flex justify-between items-center mb-3">
+                            <span className="text-sm font-semibold text-zinc-300">{comment.author}</span>
+                            <span className="text-xs font-mono text-zinc-500">{comment.date}</span>
+                          </div>
+                          <p className="text-sm text-zinc-400 font-light leading-relaxed mb-4">{comment.text}</p>
+                          <div className="flex items-center gap-2 mt-4">
+                            <button
+                              onClick={() => handleToggleLike(expandedArticle.title, comment.id)}
+                              className="group flex items-center gap-1.5 focus:outline-none"
+                            >
+                              <div className="relative flex items-center justify-center p-1.5 rounded-full hover:bg-zinc-800 transition-colors">
+                                <Heart 
+                                  className={`w-4 h-4 transition-all duration-300 ${comment.isLiked ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-500 group-hover:text-red-400'}`} 
+                                />
+                                <AnimatePresence>
+                                  {comment.isLiked && (
+                                    <motion.div
+                                      initial={{ scale: 0.5, opacity: 1 }}
+                                      animate={{ scale: 1.5, opacity: 0 }}
+                                      exit={{ opacity: 0 }}
+                                      transition={{ duration: 0.4 }}
+                                      className="absolute inset-0 bg-red-500 rounded-full z-0"
+                                    />
+                                  )}
+                                </AnimatePresence>
+                              </div>
+                              <span className={`text-xs font-mono transition-colors ${comment.isLiked ? 'text-red-500' : 'text-zinc-500'}`}>
+                                {comment.likes > 0 ? comment.likes : 'Like'}
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-zinc-500 font-light italic">No comments yet. Be the first to share your thoughts!</p>
+                    )}
+                  </div>
+
+                  <form onSubmit={handleAddComment} className="flex flex-col gap-4">
+                    <textarea 
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Leave a comment..."
+                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-300 font-light focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all resize-none h-24"
+                    />
+                    <button 
+                      type="submit"
+                      disabled={!newComment.trim()}
+                      className="self-end px-6 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white text-sm font-semibold rounded-full transition-all shadow-lg shadow-blue-900/20"
+                    >
+                      Post Comment
+                    </button>
+                  </form>
+                </div>
               </div>
             </motion.div>
           </motion.div>
