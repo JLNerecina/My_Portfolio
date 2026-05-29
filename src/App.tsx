@@ -229,6 +229,7 @@ export default function App() {
   const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
   const [expandedArticle, setExpandedArticle] = useState<Article | null>(null);
+  const [expandedLinkedInPosts, setExpandedLinkedInPosts] = useState<{ [id: string]: boolean }>({});
   const [comments, setComments] = useState<{ [title: string]: { id: number; author: string; text: string; date: string; likes: number; isLiked: boolean }[] }>({});
   const [newComment, setNewComment] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
@@ -591,6 +592,13 @@ export default function App() {
         })
       };
     });
+  };
+
+  const toggleExpandLinkedInPost = (id: string) => {
+    setExpandedLinkedInPosts(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
 
   return (
@@ -1364,7 +1372,21 @@ export default function App() {
                     </div>
 
                     <div className="text-zinc-300 font-light text-sm leading-relaxed mb-8 flex-grow whitespace-pre-line group-hover:text-white transition-colors">
-                      {post.content}
+                      {expandedLinkedInPosts[post.id] 
+                        ? post.content 
+                        : `${post.content.slice(0, 160)}...`}
+                      {post.content.length > 160 && (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleExpandLinkedInPost(post.id);
+                          }}
+                          className="ml-1.5 inline-flex items-center text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors focus:outline-none cursor-pointer"
+                        >
+                          {expandedLinkedInPosts[post.id] ? "Show Less" : "See More"}
+                        </button>
+                      )}
                     </div>
 
                     <div className="mt-auto pt-4 border-t border-zinc-800/60">
