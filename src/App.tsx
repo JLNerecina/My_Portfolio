@@ -1343,38 +1343,42 @@ export default function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="bg-[#121212]/80 border border-zinc-800/80 rounded-[2rem] p-6 sm:p-8 hover:border-zinc-700/60 shadow-xl transition-all flex flex-col h-full"
+                className="h-full"
               >
-                <div className="flex justify-between items-start mb-6">
-                  <div className="flex items-center gap-4">
-                    <img src="/My Logo - JLN.png" alt={post.author} className="w-12 h-12 rounded-full object-contain bg-black/60 p-1 border border-zinc-700/50" />
-                    <div>
-                      <h4 className="text-white font-semibold flex items-center leading-tight">
-                        {post.author}
-                        <span className="w-1 h-1 bg-zinc-600 rounded-full mx-2 hidden sm:block"></span>
-                        <span className="text-[10px] text-zinc-500 font-normal hidden sm:block">1st</span>
-                      </h4>
-                      <p className="text-xs text-zinc-400 font-light mt-0.5">{post.role}</p>
-                      <p className="text-[10px] text-zinc-500 font-mono mt-1">{post.date}</p>
+                <Tilt tiltMaxAngleX={3} tiltMaxAngleY={3} scale={1.01} transitionSpeed={2000} className="h-full">
+                  <div className="bg-[#121212]/80 border border-zinc-800/80 rounded-[2rem] p-6 sm:p-8 hover:border-[#0a66c2]/40 shadow-xl hover:shadow-[#0a66c2]/5 transition-all flex flex-col h-full group duration-300">
+                    <div className="flex justify-between items-start mb-6">
+                      <div className="flex items-center gap-4">
+                        <img src="/My Logo - JLN.png" alt={post.author} className="w-12 h-12 rounded-full object-contain bg-black/60 p-1 border border-zinc-700/50" />
+                        <div>
+                          <h4 className="text-white font-semibold flex items-center leading-tight">
+                            {post.author}
+                            <span className="w-1 h-1 bg-zinc-600 rounded-full mx-2 hidden sm:block"></span>
+                            <span className="text-[10px] text-zinc-500 font-normal hidden sm:block">1st</span>
+                          </h4>
+                          <p className="text-xs text-zinc-400 font-light mt-0.5">{post.role}</p>
+                          <p className="text-[10px] text-zinc-500 font-mono mt-1">{post.date}</p>
+                        </div>
+                      </div>
+                      <MoreHorizontal className="w-5 h-5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
+                    </div>
+
+                    <div className="text-zinc-300 font-light text-sm leading-relaxed mb-8 flex-grow whitespace-pre-line group-hover:text-white transition-colors">
+                      {post.content}
+                    </div>
+
+                    <div className="mt-auto pt-4 border-t border-zinc-800/60">
+                      <a 
+                        href={post.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center justify-center w-full py-3 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-sm font-semibold hover:bg-[#0a66c2] hover:text-white transition-all gap-2 duration-300 hover:border-transparent hover:shadow-lg hover:shadow-[#0a66c2]/20"
+                      >
+                        View Post on LinkedIn
+                      </a>
                     </div>
                   </div>
-                  <MoreHorizontal className="w-5 h-5 text-zinc-500" />
-                </div>
-
-                <div className="text-zinc-300 font-light text-sm leading-relaxed mb-8 flex-grow whitespace-pre-line">
-                  {post.content}
-                </div>
-
-                <div className="mt-auto pt-4 border-t border-zinc-800/60">
-                  <a 
-                    href={post.link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex items-center justify-center w-full py-3 bg-zinc-900 border border-zinc-800 text-zinc-300 rounded-xl text-sm font-semibold hover:bg-zinc-800 transition-colors gap-2"
-                  >
-                    View Post on LinkedIn
-                  </a>
-                </div>
+                </Tilt>
               </motion.div>
             ))}
           </div>
