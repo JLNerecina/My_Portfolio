@@ -1371,13 +1371,44 @@ export default function App() {
                       <MoreHorizontal className="w-5 h-5 text-zinc-500 group-hover:text-zinc-300 transition-colors" />
                     </div>
 
-                    <div className="text-zinc-300 font-light text-sm leading-relaxed mb-8 flex-grow whitespace-pre-line group-hover:text-white transition-colors">
-                      {expandedLinkedInPosts[post.id] 
-                        ? post.content 
-                        : `${post.content.slice(0, 160)}...`}
+                    <motion.div layout className="text-zinc-300 font-light text-sm leading-relaxed mb-8 flex-grow whitespace-pre-line group-hover:text-white transition-colors">
+                      {post.content.length > 160 ? (
+                        <>
+                          <motion.span layout="position">{post.content.slice(0, 160)}</motion.span>
+                          <AnimatePresence mode="popLayout">
+                            {expandedLinkedInPosts[post.id] ? (
+                              <motion.span
+                                key="expanded"
+                                layout="position"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                {post.content.slice(160)}
+                              </motion.span>
+                            ) : (
+                              <motion.span
+                                key="collapsed"
+                                layout="position"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                              >
+                                ...
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </>
+                      ) : (
+                        <motion.span layout="position">{post.content}</motion.span>
+                      )}
+                      
                       {post.content.length > 160 && (
-                        <button
-                          onClick={(e) => {
+                        <motion.button
+                          layout="position"
+                          onClick={(e: React.MouseEvent) => {
                             e.preventDefault();
                             e.stopPropagation();
                             toggleExpandLinkedInPost(post.id);
@@ -1385,9 +1416,9 @@ export default function App() {
                           className="ml-1.5 inline-flex items-center text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors focus:outline-none cursor-pointer"
                         >
                           {expandedLinkedInPosts[post.id] ? "Show Less" : "See More"}
-                        </button>
+                        </motion.button>
                       )}
-                    </div>
+                    </motion.div>
 
                     <div className="mt-auto pt-4 border-t border-zinc-800/60">
                       <a 
