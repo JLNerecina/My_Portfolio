@@ -179,16 +179,6 @@ const LazyImage = ({ src, alt, className, containerClassName }: { src: string; a
 };
 
 // Types
-interface Article {
-  title: string;
-  excerpt: string;
-  content?: string;
-  date: string;
-  readTime: string;
-  tags: string[];
-  link?: string;
-}
-
 interface LinkedInPost {
   id: string;
   author: string;
@@ -228,25 +218,16 @@ export default function App() {
   const [activeProject, setActiveProject] = useState(0);
   const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
-  const [expandedArticle, setExpandedArticle] = useState<Article | null>(null);
   const [expandedLinkedInPosts, setExpandedLinkedInPosts] = useState<{ [id: string]: boolean }>({});
-  const [comments, setComments] = useState<{ [title: string]: { id: number; author: string; text: string; date: string; likes: number; isLiked: boolean }[] }>({});
-  const [newComment, setNewComment] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const articlesRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
     restDelta: 0.001
-  });
-
-  const { scrollYProgress: articlesScrollProgress } = useScroll({
-    target: articlesRef,
-    offset: ["start center", "end center"]
   });
 
   useEffect(() => {
@@ -524,76 +505,6 @@ export default function App() {
     }
   ];
 
-  const articles: Article[] = [
-    {
-      title: "Building Modern React Portfolios",
-      excerpt: "A deep dive into crafting 3D tilt effects, parallax scrolling, and optimizing glassmorphism interfaces in modern React 18+.",
-      content: "When building a modern portfolio, performance and visual impact go hand-in-hand. By leveraging React 18's concurrent features, alongside Framer Motion for buttery-smooth animations, we can craft experiences that feel alive. \n\nWe extensively use `react-parallax-tilt` to give depth to cards, making the user interface tactile and interactive. Combining this with CSS backdrop filters allows for beautiful glassmorphism that perfectly meshes with dark, cosmic themes.",
-      date: "May 25, 2026",
-      readTime: "5 min read",
-      tags: ["React", "UI/UX", "Tailwind CSS"],
-      link: "#"
-    },
-    {
-      title: "Understanding Vite's Fast HMR",
-      excerpt: "How Vite achieves its incredibly fast Hot Module Replacement by leveraging native ES modules in the browser.",
-      content: "Traditional bundlers like Webpack build the entire application before serving it, which leads to slow startup times and delayed Hot Module Replacement (HMR) as project size grows. Vite fundamentally changes this paradigm.\n\nBy leveraging native ES modules in the browser, Vite serves source code directly and only transforms files as they are requested. This means HMR updates are virtually instantaneous regardless of application size, providing an unparalleled developer experience.",
-      date: "Apr 12, 2026",
-      readTime: "7 min read",
-      tags: ["Vite", "Build Tools", "Performance"],
-      link: "#"
-    },
-    {
-      title: "The Art of Data Visualization with D3.js",
-      excerpt: "Bridging the gap between raw data and meaningful insights using powerful SVG manipulations and data joining.",
-      content: "Data visualization is more than just drawing charts; it's about telling a compelling story with data. D3.js (Data-Driven Documents) provides the low-level primitives necessary to bind arbitrary data to exactly crafted DOM representations.\n\nIn my recent projects, wrapping D3 up in React components allowed me to seamlessly combine React's declarative rendering with D3's sophisticated math and scaling utilities, resulting in interactive maps and deep hierarchical data visualizations.",
-      date: "Mar 10, 2026",
-      readTime: "6 min read",
-      tags: ["D3.js", "Data Visualization", "JavaScript"],
-      link: "#"
-    }
-  ];
-
-  const handleAddComment = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim() || !expandedArticle) return;
-    
-    const comment = {
-      id: Date.now(),
-      author: "Guest User",
-      text: newComment,
-      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-      likes: 0,
-      isLiked: false
-    };
-    
-    setComments(prev => ({
-      ...prev,
-      [expandedArticle.title]: [...(prev[expandedArticle.title] || []), comment]
-    }));
-    
-    setNewComment("");
-  };
-
-  const handleToggleLike = (articleTitle: string, commentId: number) => {
-    setComments(prev => {
-      const articleComments = prev[articleTitle] || [];
-      return {
-        ...prev,
-        [articleTitle]: articleComments.map(comment => {
-          if (comment.id === commentId) {
-            return {
-              ...comment,
-              isLiked: !comment.isLiked,
-              likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1
-            };
-          }
-          return comment;
-        })
-      };
-    });
-  };
-
   const toggleExpandLinkedInPost = (id: string) => {
     setExpandedLinkedInPosts(prev => ({
       ...prev,
@@ -648,7 +559,7 @@ export default function App() {
                 { id: 'timeline', label: 'Journey', icon: <LineChart className="w-4 h-4" /> },
                 { id: 'skills', label: 'Skills', icon: <Code2 className="w-4 h-4" /> },
                 { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-4 h-4" /> },
-                { id: 'articles', label: 'Articles', icon: <BookOpen className="w-4 h-4" /> },
+                { id: 'linkedin-posts', label: 'Activity', icon: <Linkedin className="w-4 h-4" /> },
               ].map((item) => (
                 <li 
                   key={item.id} 
@@ -687,7 +598,7 @@ export default function App() {
               { id: 'timeline', label: 'Journey', icon: <LineChart className="w-5 h-5" /> },
               { id: 'skills', label: 'Skills', icon: <Code2 className="w-5 h-5" /> },
               { id: 'projects', label: 'Projects', icon: <FolderOpen className="w-5 h-5" /> },
-              { id: 'articles', label: 'Articles', icon: <BookOpen className="w-5 h-5" /> },
+              { id: 'linkedin-posts', label: 'Activity', icon: <Linkedin className="w-5 h-5" /> },
             ].map((item) => (
               <li 
                 key={item.id} 
@@ -1249,78 +1160,6 @@ export default function App() {
         </div>
       </section>
 
-      {/* Articles / Tech Blog Section */}
-      <section id="articles" ref={articlesRef} className="py-16 lg:py-24 relative z-10">
-        <div className="max-w-7xl mx-auto px-6 relative h-full">
-          
-          {/* Sticky/Fixed-style progress pill for the section */}
-          <div className="sticky top-24 z-50 flex justify-end w-full h-0 pointer-events-none mb-12 lg:mb-0">
-             <div className="pointer-events-auto flex items-center gap-4 bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 px-5 py-2.5 rounded-full shadow-lg -mt-16 lg:mt-0 lg:-translate-y-3">
-               <div className="flex items-center gap-2">
-                 <BookOpen className="w-3.5 h-3.5 text-blue-500" />
-                 <span className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest mt-0.5">Feed Progress</span>
-               </div>
-               <div className="w-24 md:w-32 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                 <motion.div 
-                   style={{ scaleX: articlesScrollProgress, transformOrigin: 'left' }}
-                   className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
-                 />
-               </div>
-             </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row justify-between items-start mb-12 relative z-20 pointer-events-none">
-            <div className="flex flex-col pointer-events-auto">
-              <h2 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Tech Blog</h2>
-              <p className="text-zinc-400 max-w-xl text-lg lg:text-xl font-light">Insights, tutorials, and development logs.</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.map((article, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="h-full"
-              >
-                <Tilt tiltMaxAngleX={3} tiltMaxAngleY={3} scale={1.02} transitionSpeed={2000} className="h-full">
-                  <div 
-                    onClick={() => setExpandedArticle(article)}
-                    className="cursor-pointer flex flex-col h-full bg-[#121212]/80 border border-zinc-800/80 rounded-3xl p-8 hover:border-zinc-700/60 shadow-xl transition-all group"
-                  >
-                    <div className="flex justify-between items-start mb-6">
-                      <span className="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-[10px] font-mono tracking-widest uppercase">
-                        {article.tags[0]}
-                      </span>
-                      <span className="text-xs font-mono text-zinc-500 flex items-center gap-1.5">
-                        <BookOpen className="w-3.5 h-3.5" />
-                        {article.readTime}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-blue-400 transition-colors leading-snug">
-                      {article.title}
-                    </h3>
-                    
-                    <p className="text-zinc-400 font-light text-sm leading-relaxed mb-6 flex-grow">
-                      {article.excerpt}
-                    </p>
-                    
-                    <div className="flex items-center justify-between pt-6 border-t border-zinc-800/60 mt-auto">
-                      <span className="text-xs font-mono text-zinc-500">{article.date}</span>
-                      <ExternalLink className="w-4 h-4 text-zinc-600 group-hover:text-blue-400 transition-colors" />
-                    </div>
-                  </div>
-                </Tilt>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* LinkedIn Featured Posts Section */}
       <section id="linkedin-posts" className="py-16 lg:py-24 bg-black/40 backdrop-blur-sm relative z-10 border-y border-white/5">
         <div className="max-w-7xl mx-auto px-6">
@@ -1664,149 +1503,6 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Article Modal */}
-      <AnimatePresence>
-        {expandedArticle && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/80 backdrop-blur-sm"
-            onClick={() => setExpandedArticle(null)}
-          >
-            <motion.div 
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-zinc-950 border border-zinc-800 rounded-[2rem] w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button 
-                onClick={() => setExpandedArticle(null)}
-                className="absolute top-6 right-6 p-2 bg-zinc-900 hover:bg-zinc-800 rounded-full text-zinc-400 hover:text-white transition-colors z-20"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
-              <div className="p-8 md:p-12 relative z-10 pt-16">
-                <div className="flex flex-col gap-6 mb-10">
-                  <div className="flex items-center gap-4 text-xs font-mono text-zinc-500 uppercase tracking-widest">
-                    <span>{expandedArticle.date}</span>
-                    <span className="w-1 h-1 bg-zinc-700 rounded-full"></span>
-                    <span className="flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> {expandedArticle.readTime}</span>
-                  </div>
-                  
-                  <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">
-                    {expandedArticle.title}
-                  </h2>
-                  
-                  <div className="flex flex-wrap gap-2">
-                    {expandedArticle.tags.map((tag) => (
-                      <span key={tag} className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg text-[10px] font-mono tracking-widest uppercase text-blue-400">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                
-                <div className="w-full h-px bg-zinc-800/80 mb-10"></div>
-                
-                <article className="prose prose-invert prose-zinc max-w-none text-zinc-300 font-light leading-loose">
-                  {expandedArticle.content?.split('\n').map((paragraph, idx) => (
-                    <p key={idx} className="mb-6">{paragraph}</p>
-                  ))}
-                </article>
-
-                {/* Social Share */}
-                <div className="flex items-center gap-4 pt-10 mt-10 border-t border-zinc-800/80">
-                  <span className="text-xs font-mono text-zinc-500 uppercase tracking-widest">Share Article</span>
-                  <a 
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(expandedArticle.title)}&url=${encodeURIComponent(window.location.href)}`}
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="p-2.5 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-400 hover:text-white hover:bg-blue-400 hover:border-blue-500/50 transition-all shadow-sm hover:shadow-blue-500/20"
-                    aria-label="Share on Twitter"
-                  >
-                    <Twitter className="w-4 h-4" />
-                  </a>
-                  <a 
-                    href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(expandedArticle.title)}`}
-                    target="_blank" 
-                    rel="noreferrer"
-                    className="p-2.5 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-400 hover:text-white hover:bg-blue-600 hover:border-blue-500/50 transition-all shadow-sm hover:shadow-blue-600/20"
-                    aria-label="Share on LinkedIn"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                </div>
-
-                {/* Comments Section */}
-                <div className="pt-10 mt-10 border-t border-zinc-800/80">
-                  <h3 className="text-xl font-bold tracking-tight text-white mb-6">Comments</h3>
-                  
-                  <div className="space-y-6 mb-8">
-                    {comments[expandedArticle.title]?.length > 0 ? (
-                      comments[expandedArticle.title].map((comment) => (
-                        <div key={comment.id} className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-5">
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="text-sm font-semibold text-zinc-300">{comment.author}</span>
-                            <span className="text-xs font-mono text-zinc-500">{comment.date}</span>
-                          </div>
-                          <p className="text-sm text-zinc-400 font-light leading-relaxed mb-4">{comment.text}</p>
-                          <div className="flex items-center gap-2 mt-4">
-                            <button
-                              onClick={() => handleToggleLike(expandedArticle.title, comment.id)}
-                              className="group flex items-center gap-1.5 focus:outline-none"
-                            >
-                              <div className="relative flex items-center justify-center p-1.5 rounded-full hover:bg-zinc-800 transition-colors">
-                                <Heart 
-                                  className={`w-4 h-4 transition-all duration-300 ${comment.isLiked ? 'fill-red-500 text-red-500 scale-110' : 'text-zinc-500 group-hover:text-red-400'}`} 
-                                />
-                                <AnimatePresence>
-                                  {comment.isLiked && (
-                                    <motion.div
-                                      initial={{ scale: 0.5, opacity: 1 }}
-                                      animate={{ scale: 1.5, opacity: 0 }}
-                                      exit={{ opacity: 0 }}
-                                      transition={{ duration: 0.4 }}
-                                      className="absolute inset-0 bg-red-500 rounded-full z-0"
-                                    />
-                                  )}
-                                </AnimatePresence>
-                              </div>
-                              <span className={`text-xs font-mono transition-colors ${comment.isLiked ? 'text-red-500' : 'text-zinc-500'}`}>
-                                {comment.likes > 0 ? comment.likes : 'Like'}
-                              </span>
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="text-sm text-zinc-500 font-light italic">No comments yet. Be the first to share your thoughts!</p>
-                    )}
-                  </div>
-
-                  <form onSubmit={handleAddComment} className="flex flex-col gap-4">
-                    <textarea 
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Leave a comment..."
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-sm text-zinc-300 font-light focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all resize-none h-24"
-                    />
-                    <button 
-                      type="submit"
-                      disabled={!newComment.trim()}
-                      className="self-end px-6 py-2.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white text-sm font-semibold rounded-full transition-all shadow-lg shadow-blue-900/20"
-                    >
-                      Post Comment
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
