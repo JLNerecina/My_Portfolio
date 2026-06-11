@@ -238,8 +238,6 @@ export default function App() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  const categories = ["All", "Frontend", "Fullstack", "Data Visualization"];
-
   useEffect(() => {
     const handleResize = () => {
       setItemsPerViewProject(window.innerWidth >= 1024 ? 2 : 1);
@@ -389,6 +387,11 @@ export default function App() {
       stats: { loc: "10.6k", commits: 115, stars: 3 }
     }
   ];
+
+  const predefinedCategories = ["All", "Frontend", "Fullstack", "Data Visualization"];
+  const dynamicCategories = Array.from(new Set(projects.flatMap(p => p.tags)))
+    .filter(tag => !predefinedCategories.includes(tag));
+  const categories = [...predefinedCategories, ...dynamicCategories];
 
   const filteredProjects = filterCategory === "All" 
     ? projects 
