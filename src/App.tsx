@@ -32,6 +32,7 @@ import {
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import Tilt from 'react-parallax-tilt';
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell, YAxis } from 'recharts';
 import { GitHubCalendar } from 'react-github-calendar';
 import { GitHubStats } from './components/GitHubStats';
 
@@ -1446,28 +1447,52 @@ export default function App() {
                     {expandedProject.stats && (
                       <div className="p-6 bg-zinc-900/30 border border-zinc-800/50 rounded-3xl backdrop-blur-sm">
                         <h4 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-4">Project Stats</h4>
-                        <div className="flex flex-col gap-4">
-                           <div className="flex items-center justify-between text-zinc-300">
-                             <div className="flex items-center gap-2">
-                               <FileCode2 className="w-4 h-4 text-zinc-500" />
-                               <span className="text-sm">Lines of Code</span>
-                             </div>
-                             <span className="text-sm font-mono">{expandedProject.stats.loc}</span>
-                           </div>
-                           <div className="flex items-center justify-between text-zinc-300">
-                             <div className="flex items-center gap-2">
-                               <GitCommit className="w-4 h-4 text-zinc-500" />
-                               <span className="text-sm">Commits</span>
-                             </div>
-                             <span className="text-sm font-mono">{expandedProject.stats.commits}</span>
-                           </div>
-                           <div className="flex items-center justify-between text-zinc-300">
-                             <div className="flex items-center gap-2">
-                               <Star className="w-4 h-4 text-zinc-500" />
-                               <span className="text-sm">Stars</span>
-                             </div>
-                             <span className="text-sm font-mono">{expandedProject.stats.stars}</span>
-                           </div>
+                        <div className="h-48 w-full mt-4">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              data={[
+                                { 
+                                  name: 'LOC', 
+                                  value: expandedProject.stats.loc.includes('k') ? parseFloat(expandedProject.stats.loc) * 1000 : parseInt(expandedProject.stats.loc.replace(/\\D/g, '')), 
+                                  display: expandedProject.stats.loc,
+                                  fill: '#3b82f6' 
+                                },
+                                { 
+                                  name: 'Commits', 
+                                  value: expandedProject.stats.commits, 
+                                  display: expandedProject.stats.commits.toString(),
+                                  fill: '#10b981' 
+                                },
+                                { 
+                                  name: 'Stars', 
+                                  value: expandedProject.stats.stars, 
+                                  display: expandedProject.stats.stars.toString(),
+                                  fill: '#f59e0b' 
+                                }
+                              ]}
+                              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                            >
+                              <XAxis dataKey="name" stroke="#71717a" fontSize={12} tickLine={false} axisLine={false} />
+                              <YAxis stroke="#71717a" fontSize={10} tickLine={false} axisLine={false} />
+                              <Tooltip 
+                                cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                                contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '12px', fontSize: '12px', color: '#e4e4e7' }}
+                                formatter={(value: any, name: any, props: any) => [props.payload.display, props.payload.name]}
+                                labelStyle={{ display: 'none' }}
+                              />
+                              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                {
+                                  [
+                                    { fill: '#3b82f6' },
+                                    { fill: '#10b981' },
+                                    { fill: '#f59e0b' }
+                                  ].map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                  ))
+                                }
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
                         </div>
                       </div>
                     )}
