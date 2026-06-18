@@ -27,7 +27,8 @@ import {
   Heart,
   ThumbsUp,
   MessageCircle,
-  MoreHorizontal
+  MoreHorizontal,
+  Clock
 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
@@ -204,6 +205,7 @@ interface Project {
     commits: number;
     stars: number;
   };
+  lastUpdated?: string;
 }
 
 interface Skill {
@@ -337,7 +339,8 @@ export default function App() {
       github: "https://github.com/JLNerecina/NEU-Library-Visitor-App",
       link: "https://remix-neu-library-visitor-app-230692279419.us-west1.run.app/",
       image: "/NEU Library Visitor App Preview 1.png",
-      stats: { loc: "3.2k", commits: 24, stars: 0 }
+      stats: { loc: "3.2k", commits: 24, stars: 0 },
+      lastUpdated: "May 2026"
     },
     {
       title: "NEU MOA Monitoring System",
@@ -354,7 +357,8 @@ export default function App() {
       github: "https://github.com/JLNerecina/NEU-MOA-Monitoring-System",
       link: "https://neu-moa-monitoring-system-230692279419.us-west1.run.app/",
       image: "/NEU MOA Monitoring System Preview.png",
-      stats: { loc: "600+", commits: 12, stars: 0 }
+      stats: { loc: "600+", commits: 12, stars: 0 },
+      lastUpdated: "Apr 2026"
     },
     {
       title: "CICS Curriculum Map System",
@@ -370,7 +374,8 @@ export default function App() {
       tags: ["KM Framework", "D3.js", "Education"],
       github: "https://github.com/JLNerecina/PE2-KM-Curriculum-Map",
       image: "/CICS Curriculum Map.png",
-      stats: { loc: "4.2k", commits: 48, stars: 3 }
+      stats: { loc: "4.2k", commits: 48, stars: 3 },
+      lastUpdated: "Dec 2025"
     },
     {
       title: "HOPE, Inc. Product Management System",
@@ -386,7 +391,8 @@ export default function App() {
       tags: ["Fullstack", "Management System", "Tailwind"],
       github: "https://github.com/fausturnacht/SE2-Zendata-HopePMS",
       image: "/PMS Dashboard.png",
-      stats: { loc: "10.6k", commits: 115, stars: 3 }
+      stats: { loc: "10.6k", commits: 115, stars: 3 },
+      lastUpdated: "Oct 2025"
     }
   ];
 
@@ -1160,6 +1166,12 @@ export default function App() {
                           </div>
                         </div>
                         <h3 className="text-xl font-medium mb-3 text-white">{project.title}</h3>
+                        {project.lastUpdated && (
+                          <div className="flex items-center text-[10px] uppercase tracking-widest text-zinc-500 mb-4 font-mono">
+                            <Clock className="w-3.5 h-3.5 mr-1.5 text-blue-500/70" /> 
+                            Updated {project.lastUpdated}
+                          </div>
+                        )}
                         <p className="text-zinc-400 text-sm leading-relaxed mb-6 font-light">
                           {project.description}
                         </p>
@@ -1479,14 +1491,22 @@ export default function App() {
               <div className="px-8 pb-12 md:px-12 md:pb-16 relative z-10 -mt-20">
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
                   <div className="flex-1">
-                     <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-4 text-white">{expandedProject.title}</h2>
-                     <div className="flex flex-wrap gap-2">
+                     <div className="flex flex-col gap-3">
+                       <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white">{expandedProject.title}</h2>
+                       {expandedProject.lastUpdated && (
+                          <div className="flex items-center text-[10px] uppercase tracking-widest text-zinc-400 mb-1 font-mono">
+                            <Clock className="w-3.5 h-3.5 mr-1.5 text-blue-500" /> 
+                            Updated {expandedProject.lastUpdated}
+                          </div>
+                       )}
+                       <div className="flex flex-wrap gap-2">
                         {expandedProject.tags.map((tag) => (
                           <span key={tag} className="px-3 py-1 bg-blue-500/10 border border-blue-500/20 rounded-lg text-[10px] font-mono tracking-widest uppercase text-blue-400">
                             {tag}
                           </span>
                         ))}
                       </div>
+                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
                     <button 
