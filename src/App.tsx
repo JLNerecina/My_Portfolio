@@ -35,6 +35,7 @@ import Tilt from 'react-parallax-tilt';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell, YAxis } from 'recharts';
 import { GitHubCalendar } from 'react-github-calendar';
 import { GitHubStats } from './components/GitHubStats';
+import jsPDF from 'jspdf';
 
 // --- LIQUID GLASS COMPONENT ---
 const LiquidGlass = () => {
@@ -514,6 +515,96 @@ export default function App() {
       ...prev,
       [id]: !prev[id]
     }));
+  };
+
+  const generatePDF = (project: Project) => {
+    const doc = new jsPDF();
+    
+    // Title
+    doc.setFontSize(22);
+    doc.setFont('helvetica', 'bold');
+    doc.text(project.title, 20, 30);
+    
+    // Tags
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(project.tags.join(' • '), 20, 40);
+
+    // Description
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Overview', 20, 55);
+
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(50, 50, 50);
+    const splitDescription = doc.splitTextToSize(project.longDescription || project.description, 170);
+    doc.text(splitDescription, 20, 65);
+
+    let yPos = 65 + (splitDescription.length * 7) + 10;
+
+    // Features
+    if (project.features && project.features.length > 0) {
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Key Features', 20, yPos);
+      yPos += 10;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(50, 50, 50);
+      project.features.forEach(feature => {
+        const splitFeature = doc.splitTextToSize(`• ${feature}`, 170);
+        doc.text(splitFeature, 20, yPos);
+        yPos += splitFeature.length * 7;
+      });
+      yPos += 5;
+    }
+
+    // Stats
+    if (project.stats) {
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Project Stats', 20, yPos);
+      yPos += 10;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(50, 50, 50);
+      doc.text(`Lines of Code: ${project.stats.loc}`, 20, yPos);
+      yPos += 7;
+      doc.text(`Commits: ${project.stats.commits}`, 20, yPos);
+      yPos += 7;
+      doc.text(`Stars: ${project.stats.stars}`, 20, yPos);
+      yPos += 10;
+    }
+
+    // Links
+    if (project.github || project.link) {
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'bold');
+      doc.text('Links', 20, yPos);
+      yPos += 10;
+
+      doc.setFontSize(12);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(0, 102, 204);
+      if (project.github) {
+        doc.textWithLink('GitHub Repository', 20, yPos, { url: project.github });
+        yPos += 7;
+      }
+      if (project.link) {
+        doc.textWithLink('Live Demo', 20, yPos, { url: project.link });
+        yPos += 7;
+      }
+    }
+
+    doc.save(`${project.title.replace(/\s+/g, '_')}_Sheet.pdf`);
   };
 
   return (
@@ -1398,6 +1489,12 @@ export default function App() {
                       </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
+                    <button 
+                      onClick={() => generatePDF(expandedProject)}
+                      className="inline-flex items-center px-4 py-2.5 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 hover:text-white text-zinc-300 text-sm transition-all hover:scale-105 active:scale-95 shadow-xl"
+                    >
+                      <Download className="w-4 h-4 mr-2" /> PDF Sheet
+                    </button>
                     {expandedProject.github && (
                       <a href={expandedProject.github} target="_blank" rel="noreferrer" className="inline-flex items-center px-5 py-2.5 bg-zinc-900 border border-zinc-800 rounded-full hover:bg-zinc-800 hover:text-white text-zinc-300 text-sm transition-all hover:scale-105 active:scale-95 shadow-xl">
                         <Github className="w-4 h-4 mr-2" /> Source
