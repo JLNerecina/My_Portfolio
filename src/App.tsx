@@ -200,6 +200,7 @@ interface Project {
   link?: string;
   github?: string;
   image?: string;
+  gallery?: string[];
   stats?: {
     loc: string;
     commits: number;
@@ -222,6 +223,7 @@ export default function App() {
   const [activeProject, setActiveProject] = useState(0);
   const [itemsPerViewProject, setItemsPerViewProject] = useState(1);
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
+  const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
   const [expandedLinkedInPosts, setExpandedLinkedInPosts] = useState<{ [id: string]: boolean }>({});
   const [filterCategory, setFilterCategory] = useState("All");
 
@@ -339,6 +341,11 @@ export default function App() {
       github: "https://github.com/JLNerecina/NEU-Library-Visitor-App",
       link: "https://remix-neu-library-visitor-app-230692279419.us-west1.run.app/",
       image: "/NEU Library Visitor App Preview 1.png",
+      gallery: [
+        "/NEU Library Visitor App Preview 1.png",
+        "https://images.unsplash.com/photo-1555680202-c86f0e12f086?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
       stats: { loc: "3.2k", commits: 24, stars: 0 },
       lastUpdated: "May 2026"
     },
@@ -357,6 +364,11 @@ export default function App() {
       github: "https://github.com/JLNerecina/NEU-MOA-Monitoring-System",
       link: "https://neu-moa-monitoring-system-230692279419.us-west1.run.app/",
       image: "/NEU MOA Monitoring System Preview.png",
+      gallery: [
+        "/NEU MOA Monitoring System Preview.png",
+        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
       stats: { loc: "600+", commits: 12, stars: 0 },
       lastUpdated: "Apr 2026"
     },
@@ -374,6 +386,11 @@ export default function App() {
       tags: ["KM Framework", "D3.js", "Education"],
       github: "https://github.com/JLNerecina/PE2-KM-Curriculum-Map",
       image: "/CICS Curriculum Map.png",
+      gallery: [
+        "/CICS Curriculum Map.png",
+        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1543286386-2e659306cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
       stats: { loc: "4.2k", commits: 48, stars: 3 },
       lastUpdated: "Dec 2025"
     },
@@ -391,6 +408,11 @@ export default function App() {
       tags: ["Fullstack", "Management System", "Tailwind"],
       github: "https://github.com/fausturnacht/SE2-Zendata-HopePMS",
       image: "/PMS Dashboard.png",
+      gallery: [
+        "/PMS Dashboard.png",
+        "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+      ],
       stats: { loc: "10.6k", commits: 115, stars: 3 },
       lastUpdated: "Oct 2025"
     }
@@ -1152,7 +1174,10 @@ export default function App() {
                     >
                       <Tilt tiltMaxAngleX={4} tiltMaxAngleY={4} scale={1.01} transitionSpeed={2000} className="h-full">
                         <div 
-                          onClick={() => setExpandedProject(project)}
+                          onClick={() => {
+                            setExpandedProject(project);
+                            setActiveGalleryIndex(0);
+                          }}
                           className="group relative bg-[#121212] border border-zinc-800 rounded-3xl p-8 hover:border-zinc-700 transition-all h-full min-h-[420px] flex flex-col justify-between overflow-hidden mx-auto max-w-2xl cursor-pointer shadow-xl"
                         >
                       <div className="relative z-10">
@@ -1476,7 +1501,72 @@ export default function App() {
                 <X className="w-6 h-6" />
               </button>
 
-              {expandedProject.image && (
+              {expandedProject.gallery && expandedProject.gallery.length > 0 ? (
+                <div className="w-full relative group">
+                  <div className="w-full h-[300px] md:h-[450px] relative overflow-hidden bg-black">
+                    <AnimatePresence initial={false} mode="wait">
+                      <motion.div
+                        key={activeGalleryIndex}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="w-full h-full absolute inset-0"
+                      >
+                         <LazyImage 
+                           src={expandedProject.gallery[activeGalleryIndex]} 
+                           alt={`${expandedProject.title} screenshot ${activeGalleryIndex + 1}`} 
+                           containerClassName="w-full h-full"
+                           className="w-full h-full object-cover" 
+                         />
+                      </motion.div>
+                    </AnimatePresence>
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-[#0a0a0a]/40 to-transparent pointer-events-none"></div>
+                    
+                    {/* Controls */}
+                    {expandedProject.gallery.length > 1 && (
+                      <>
+                        <div className="absolute inset-y-0 left-0 flex items-center px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveGalleryIndex(prev => prev === 0 ? expandedProject.gallery!.length - 1 : prev - 1);
+                            }}
+                            className="p-2 bg-black/50 hover:bg-black/80 backdrop-blur-md rounded-full text-white transition-colors shadow-lg"
+                          >
+                            <ChevronLeft className="w-6 h-6" />
+                          </button>
+                        </div>
+                        <div className="absolute inset-y-0 right-0 flex items-center px-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setActiveGalleryIndex(prev => prev === expandedProject.gallery!.length - 1 ? 0 : prev + 1);
+                            }}
+                            className="p-2 bg-black/50 hover:bg-black/80 backdrop-blur-md rounded-full text-white transition-colors shadow-lg"
+                          >
+                            <ChevronRight className="w-6 h-6" />
+                          </button>
+                        </div>
+
+                        {/* Indicators */}
+                        <div className="absolute bottom-28 left-0 right-0 flex justify-center gap-2 z-10">
+                          {expandedProject.gallery.map((_, idx) => (
+                            <button
+                              key={idx}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveGalleryIndex(idx);
+                              }}
+                              className={`h-1.5 rounded-full transition-all duration-300 shadow-sm ${idx === activeGalleryIndex ? 'bg-blue-500 w-6' : 'bg-white/50 w-2 hover:bg-white/80'}`}
+                            />
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ) : expandedProject.image && (
                 <div className="w-full h-[300px] md:h-[450px] relative">
                   <LazyImage 
                     src={expandedProject.image} 
@@ -1484,7 +1574,7 @@ export default function App() {
                     containerClassName="w-full h-full"
                     className="w-full h-full object-cover" 
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-[#0a0a0a]/40 to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-[#0a0a0a]/40 to-transparent pointer-events-none"></div>
                 </div>
               )}
 
